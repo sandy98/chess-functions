@@ -1,0 +1,27 @@
+{
+  "name": "@sandy98/chess-functions",
+  "version": "0.9.4",
+  "author": "Domingo E. Savoretti",
+  "main": "dist/index.js",
+  "files": [
+    "dist/"
+  ],
+  "keywords": [
+    "chess",
+    "chess-rules",
+    "move-validator",
+    "chess.js",
+    "pgn-reader"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "parcel build index.js",
+    "watch": "parcel watch index.html",
+    "prepublish": "scripts/build.sh",
+    "clean": "rm dist/*"
+  },
+  "devDependencies": {
+    "node-simple-router": "^0.10.1",
+    "parcel-bundler": "^1.9.7"
+  }
+}
