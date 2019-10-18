@@ -19,9 +19,5 @@
     "watch": "parcel watch index.html",
     "prepublish": "parcel build index.js",
     "clean": "rm dist/*"
-  },
-  "devDependencies": {
-    "node-simple-router": "^0.10.1",
-    "parcel-bundler": "^1.9.7"
   }
 }
