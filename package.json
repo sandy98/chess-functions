@@ -1,5 +1,5 @@
 {
-  "name": "@sandy98/chess-functions",
+  "name": "chess-functions",
   "version": "0.9.4",
   "author": "Domingo E. Savoretti",
   "main": "dist/index.js",
