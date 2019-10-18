@@ -17,7 +17,7 @@
   "scripts": {
     "build": "parcel build index.js",
     "watch": "parcel watch index.html",
-    "prepublish": "scripts/build.sh",
+    "prepublish": "parcel build index.js",
     "clean": "rm dist/*"
   },
   "devDependencies": {
