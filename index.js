@@ -847,6 +847,12 @@ class Chess {
         this.__sans__ = ['']
     }
 
+    ascii(fennum = this.fens().length - 1, flipped = false) {
+        const sep = `   +${'-'.repeat(24)}+\n`
+        const ety = `   |${' '.repeat(24)}|\n`
+        return `${sep}${ety}`
+    }
+
     move(...moveArgs) {
         const fenObj = fen2obj(this.fen) 
         let sqFrom, sqTo, promotion
