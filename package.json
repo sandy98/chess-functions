@@ -17,7 +17,6 @@
   "scripts": {
     "build": "parcel build index.js",
     "watch": "parcel watch index.html",
-    "prepublish": "parcel build index.js",
     "clean": "rm dist/*"
   }
 }
