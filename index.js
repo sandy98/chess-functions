@@ -1,5 +1,9 @@
 "use strict";
 
+const partition = (arr, len) => arr.reduce((base, el) => 
+    base[base.length -1].length < len ? [...base.slice(0, -1), [...base[base.length -1], el]] : 
+                                        [...base, [el]] , [[]])
+
 const groupArray = arr => {
     return arr.reduce((base, x) => {
         if (x in base) {
@@ -847,10 +851,20 @@ class Chess {
         this.__sans__ = ['']
     }
 
-    ascii(fennum = this.fens().length - 1, flipped = false) {
-        const sep = `   +${'-'.repeat(24)}+\n`
-        const ety = `   |${' '.repeat(24)}|\n`
-        return `${sep}${ety}`
+    ascii(fennum , flipped = false) {
+        const separ = `   +${'---+'.repeat(8)}\n`
+        //const empty = `   ${'|   '.repeat(8)}|\n`
+        const empty = ''
+        fennum = fennum || this.fens().length - 1
+        const { fenArray } = fen2obj(this.fens()[fennum])
+        const rows = (flipped ? range(0, 7) : range(7, 0, -1)).map(n => (n + 1).toString())
+        const cols = (flipped ? range(7, 0, -1) : range(0, 7)).map(n => String.fromCharCode(n + 97))
+        const bottomLine = cols.reduce((base, el) => base + '  ' + el + ' ', '   ') + ' \n'
+        const showArray = fenArray.map((_, i, self) => self[i ^ (flipped ? 7 : 56)]).map(v => v === '0' ? ' ' : v)
+        const partArray = partition(showArray, 8)
+        const asciiArray = partArray.map((subArr, i) => subArr.reduce((base, el) => base + '| ' + el + ' ', empty + ` ${rows[i]} `) + '|\n' + empty + separ)
+
+        return `${separ}${asciiArray.join('')}${bottomLine}`
     }
 
     move(...moveArgs) {
