@@ -312,6 +312,8 @@ const army = (fen, fig) => {
 const bPawns = fen => army(fen, 'p')
 const bKnights = fen => army(fen, 'n')
 const bBishops = fen => army(fen, 'b')
+const bBishopsL = fen => army(fen, 'b').filter(sq => isLightSquare(sq))
+const bBishopsD = fen => army(fen, 'b').filter(sq => isDarkSquare(sq))
 const bRooks = fen => army(fen, 'r')
 const bQueens = fen => army(fen, 'q')
 const bKings = fen => army(fen, 'k')
@@ -319,6 +321,8 @@ const bKings = fen => army(fen, 'k')
 const wPawns = fen => army(fen, 'P')
 const wKnights = fen => army(fen, 'N')
 const wBishops = fen => army(fen, 'B')
+const wBishopsL = fen => army(fen, 'B').filter(sq => isLightSquare(sq))
+const wBishopsD = fen => army(fen, 'B').filter(sq => isDarkSquare(sq))
 const wRooks = fen => army(fen, 'R')
 const wQueens = fen => army(fen, 'Q')
 const wKings = fen => army(fen, 'K')
@@ -679,6 +683,7 @@ const stripSan = san => san.replace(/[+#=x]/g, '')
 
 const san2args = (fen, san) => {
     const fenobj = fen2obj(fen)
+    
     san = stripSan(san)
     if (san === '0-0' || san === 'O-O') {
         if (fenobj.turn === 'w') {
@@ -735,8 +740,10 @@ const san2args = (fen, san) => {
             }
         sqTo = san2sq(san.slice(san.length - 2, san.length))
         if (san.length === 5) {
+            //console.log('san length 5')
             sqFrom = san2sq(san.slice(1, 3))
         } else if (san.length === 4) {
+          //console.log('san length 4')
           const extraInfo = san[1]
           const [rowOrColFunc, geoInfo] = /[1-8]/.test(extraInfo) ? 
                                           [row, parseInt(extraInfo) - 1] : 
@@ -746,9 +753,11 @@ const san2args = (fen, san) => {
             const candids = army.filter(n => canMove(fen, n, sqTo))
             switch (candids.length) {
                 case 0:
+                    //console.log('0 candidates')
                     sqFrom = -1
                     break
                 case 1:
+                    //console.log('1 candidato: ' + candids[0])
                     sqFrom = candids[0]
                     break
                 default:
@@ -757,11 +766,13 @@ const san2args = (fen, san) => {
                         return newfen && validateFen(newfen).valid
                     })
                     // console.log("Hay " + reals.length + " jugada/s para elegir")
+                    //console.log('Reals: ' + JSON.stringify(reals))
                     sqFrom  = reals.length === 1 ? reals[0] : -1              
             } 
         }
         return {sqFrom, sqTo, promotion}
     } else {
+        //console.log('Llegamos al final sin saber que pasó')
         return {sqFrom: -1, sqTo: -1, promotion: null}
     }
 }
@@ -841,14 +852,66 @@ const args2san = (fen, sqFrom, sqTo, promotion) => {
 
 const makeFenComparable = fen => fen.split(/\s+/).slice(0, 4).join(' ')
 
+const clear = (fen) => {
+    const obj = fen2obj(fen)
+    obj.fenArray = range(0, 63).fill('0')
+    obj.fenString = array2fenString(obj.fenArray)
+    return obj2fen(obj)
+}
+
+const insuficientMaterial = (fen, color = 'w') => {
+    if (!/^[wb]$/i.test(color)) return null
+    const [frPawns, frKnights, frBishopsD, frBishopsL, frRooks, frQueens, 
+           foePawns, foeKnights, foeBishopsD, foeBishopsL, 
+           foeRooks, foeQueens] = color.toLowerCase() === 'w' ? 
+               [wPawns(fen), wKnights(fen), wBishopsD(fen), wBishopsL(fen), wRooks(fen),
+                wQueens(fen), bPawns(fen), bKnights(fen), bBishopsD(fen), bBishopsL(fen),
+                bRooks(fen), bQueens(fen) 
+               ] :
+               [bPawns(fen), bKnights(fen), bBishopsD(fen), bBishopsL(fen), bRooks(fen),
+                bQueens(fen), wPawns(fen), wKnights(fen), wBishopsD(fen), wBishopsL(fen),
+                wRooks(fen), wQueens(fen) 
+               ] 
+    
+    if (frPawns.length || frRooks.length || frQueens.length) return false // Mate de torre, dama o pieza coronada
+
+    if (frBishopsD.length && frBishopsL.length) return false // Mate de 2 alfiles
+
+    if ((frBishopsD.length || frBishopsL.length)  && frKnights.length) return false // Mate de 2 alfil y caballo
+
+    if (frKnights.length > 1) return false // Mate de 2 o más caballos
+
+    /* Mates con material que por si mismo es insuficiente, 
+       pero es "ayudado" por una pieza enemiga que ahoga */
+    if (frBishopsD.length) {
+        if (foePawns.length || foeKnights.length || foeBishopsL.length) return false
+    } else if (frBishopsL.length) {
+        if (foePawns.length || foeKnights.length || foeBishopsD.length) return false
+    } else if (frKnights.length) {
+        if (foePawns.length || foeKnights.length || 
+            foeBishopsD.length || foeBishopsL.length ||
+            foeRooks.length) return false
+    }
+    /* Fin Mates con material que por si mismo es insuficiente, 
+       pero es "ayudado" por una pieza enemiga que ahoga */
+    
+    return true
+}
+
 class Chess {
     constructor(fen = defaultFen) {
         this.reset(fen)
     }
 
     reset(fen = defaultFen) {
+        const v = validateFen(fen)
+        if (!v.valid) throw new Error(v.message)
         this.__fens__ = [fen]
         this.__sans__ = ['']
+    }
+
+    load(fen) {
+        this.reset(fen)
     }
 
     ascii(fennum , flipped = false) {
@@ -867,6 +930,11 @@ class Chess {
         return `${separ}${asciiArray.join('')}${bottomLine}`
     }
 
+    clear() {
+        this.__fens__ = [...this.__fens__.slice(0, -1), clear(this.__fens__[this.__fens__.length -1])]
+        return this
+    }
+
     move(...moveArgs) {
         const fenObj = fen2obj(this.fen) 
         let sqFrom, sqTo, promotion
@@ -874,10 +942,21 @@ class Chess {
             case 0:
                 return false
             case 1:
-                const result = san2args(this.fen, moveArgs[0])
-                sqFrom = result.sqFrom
-                sqTo = result.sqTo
-                promotion = result.promotion
+                if (sanRegExp.test(moveArgs[0])) {
+                    const result = san2args(this.fen, moveArgs[0])
+                    sqFrom = result.sqFrom
+                    sqTo = result.sqTo
+                    promotion = result.promotion
+                } else if (/[a-h][1-8]-?[a-h][1-8][QRNBqrnb]?/.test(moveArgs[0])) {
+                    if (moveArgs[0][moveArgs[0].length - 1].match(/QRNB/i)) {
+                        promotion = moveArgs[0][moveArgs[0].length - 1].toUpperCase()
+                    } else {
+                        promotion = null
+                    }
+                    const moveStr = moveArgs[0].replace(/-/g, '')
+                    sqFrom = sqNumber(moveStr.slice(0,2))
+                    sqTo = sqNumber(moveStr.slice(2,4))
+                }
                 break
             default:
                 sqFrom = sqNumber(moveArgs[0])
@@ -891,7 +970,6 @@ class Chess {
         const newFen = tryMove(this.fen, sqFrom, sqTo, promotion)
         if (!newFen) return false
         if (!validateFen(newFen).valid) return false
-
         const san = args2san(this.fen, sqFrom, sqTo, promotion)
         const { fenArray, turn, enPassant } = fenObj
         const [figFrom, figTo] = [fenArray[sqFrom], fenArray[sqTo]]
@@ -941,12 +1019,27 @@ class Chess {
             .map(it => args2san(this.fen, it.from, it.to, 'Q'))
             :
             availableMoves(this.fen).map(it => args2san(this.fen, it.from, it.to, 'Q')) 
-        }
+    }
+    
+    get version() {return '0.9.6'}
 
-    in_threefold_repetition() {
+    get in_fifty_moves_rule() {
+        return parseInt(fen2obj(this.fen).halfMoveClock) >= 100
+    }
+
+    get in_threefold_repetition() {
         const current = makeFenComparable(this.fen)
         const groups = groupArray(this.fens().map(makeFenComparable))
         return groups[current] >= 3
+    }
+
+    get insufficient_material() {
+        return insuficientMaterial(this.fen, 'w') && insuficientMaterial(this.fen, 'b')
+    }
+
+    get in_draw() {
+        return this.in_fifty_moves_rule || this.in_threefold_repetition ||
+               this.insufficient_material || this.isStaleMate
     }
 
     get isCheck() {
@@ -977,8 +1070,23 @@ class Chess {
         return isStaleMate(this.fen)
     }
 
+    get game_over() {
+        return this.in_draw || this.isCheckMate
+    }
+
     get(sq) {
         return fen2obj(this.fen).fenArray[sqNumber(sq)]
+    }
+
+    put(sq, figure) {
+        if (!/[0pnbrqkPNBRQK]/.test(figure)) return null
+        sq = sqNumber(sq)
+        const obj = fen2obj(this.fen)
+        obj.fenArray[sq] = figure
+        obj.fenString = array2fenString(obj.fenArray)
+        const newFen = obj2fen(obj)
+        this.__fens__ = [...this.__fens__.slice(0, -1), newFen]
+        return this
     }
 
     fens() { return this.__fens__}
@@ -1055,12 +1163,16 @@ const thisExports = {
     isQueenMove,
     army,
     wBishops,
+    wBishopsD,
+    wBishopsD,
     wKings,
     wKnights,
     wPawns,
     wQueens,
     wRooks,
     bBishops,
+    bBishopsD,
+    bBishopsL,
     bKings,
     bKnights,
     bPawns,
@@ -1093,6 +1205,8 @@ const thisExports = {
     stripSan, 
     args2san,
     san2args,
+    clear,
+    insuficientMaterial,
     Chess,
 }
 
