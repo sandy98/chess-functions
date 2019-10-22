@@ -970,18 +970,27 @@ class Chess {
         return this
     }
 
-    ascii(fennum , flipped = false) {
-        const separ = `   +${'---+'.repeat(8)}\n`
-        //const empty = `   ${'|   '.repeat(8)}|\n`
+    mini_ascii(fennum, flipped = false, sep = '\n') {
+        fennum = fennum || this.fens().length - 1
+        return partition(fen2obj(this.fens()[fennum]).fenArray
+            .map((_, i, self) => self[i ^ (flipped ? 7 : 56)])
+            .map(v => v === '0' ? '.' : v), 8)
+            .map(a => a.join(' '))
+            .join(sep)
+    }
+
+    ascii(fennum , flipped = false, sep = '\n') {
+        const separ = `   +${'---+'.repeat(8)}${sep}`
+        //const empty = `   ${'|   '.repeat(8)}|${sep}`
         const empty = ''
         fennum = fennum || this.fens().length - 1
         const { fenArray } = fen2obj(this.fens()[fennum])
         const rows = (flipped ? range(0, 7) : range(7, 0, -1)).map(n => (n + 1).toString())
         const cols = (flipped ? range(7, 0, -1) : range(0, 7)).map(n => String.fromCharCode(n + 97))
-        const bottomLine = cols.reduce((base, el) => base + '  ' + el + ' ', '   ') + ' \n'
+        const bottomLine = cols.reduce((base, el) => base + '  ' + el + ' ', '   ') + ` ${sep}`
         const showArray = fenArray.map((_, i, self) => self[i ^ (flipped ? 7 : 56)]).map(v => v === '0' ? ' ' : v)
         const partArray = partition(showArray, 8)
-        const asciiArray = partArray.map((subArr, i) => subArr.reduce((base, el) => base + '| ' + el + ' ', empty + ` ${rows[i]} `) + '|\n' + empty + separ)
+        const asciiArray = partArray.map((subArr, i) => subArr.reduce((base, el) => base + '| ' + el + ' ', empty + ` ${rows[i]} `) + `|${sep}` + empty + separ)
 
         return `${separ}${asciiArray.join('')}${bottomLine}`
     }
