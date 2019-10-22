@@ -1,5 +1,10 @@
 "use strict";
 
+const lpad = (stri, padChar = '0', num = 2) => `${padChar.repeat(num - stri.length)}${stri}`
+const rpad = (stri, padChar = '0', num = 2) => `${stri}${padChar.repeat(num - stri.length)}`
+
+const capitalize = stri => `${stri[0].toUpperCase()}${stri.slice(1)}`
+
 const partition = (arr, len) => arr.reduce((base, el) => 
     base[base.length -1].length < len ? [...base.slice(0, -1), [...base[base.length -1], el]] : 
                                         [...base, [el]] , [[]])
@@ -711,7 +716,9 @@ const san2args = (fen, san) => {
            sqTo = sqNumber(san.slice(1, 3))
         }
         army = fenobj.turn === 'w' ? wPawns(fen) : bPawns(fen) 
-        sqFrom = army.find(n => col(n) === colOrig && canMove(fen, n, sqTo)) || -1
+        sqFrom = army.find(n => col(n) === colOrig && canMove(fen, n, sqTo))
+        if (typeof sqFrom === 'undefined') sqFrom = -1
+
         if (/[QNRBqnrb]/.test(san[san.length - 1])) {
             promotion = san[san.length - 1]
         } else {
@@ -743,12 +750,13 @@ const san2args = (fen, san) => {
             //console.log('san length 5')
             sqFrom = san2sq(san.slice(1, 3))
         } else if (san.length === 4) {
-          //console.log('san length 4')
+          console.log('san length 4')
           const extraInfo = san[1]
           const [rowOrColFunc, geoInfo] = /[1-8]/.test(extraInfo) ? 
                                           [row, parseInt(extraInfo) - 1] : 
                                           [col, letter2col(extraInfo)]
-          sqFrom = army.find(n => rowOrColFunc(n) === geoInfo && canMove(fen, n, sqTo)) || -1
+          sqFrom = army.find(n => rowOrColFunc(n) === geoInfo && canMove(fen, n, sqTo)) 
+          if (typeof sqFrom === 'undefined') sqFrom = -1
         } else {
             const candids = army.filter(n => canMove(fen, n, sqTo))
             switch (candids.length) {
@@ -898,20 +906,41 @@ const insuficientMaterial = (fen, color = 'w') => {
     return true
 }
 
+const pgnDate = d => `${d.getFullYear()}.${lpad(d.getMonth() + 1)}.${lpad(d.getDate())}`
+
 class Chess {
     constructor(fen = defaultFen) {
-        this.reset(fen)
+        return this.reset(fen)
     }
+    
+    static sevenTags() {
+        return ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result']
+    }
+
+    static results() { return ["*", "1-0", "0-1", "1/2-1/2"]}
 
     reset(fen = defaultFen) {
         const v = validateFen(fen)
         if (!v.valid) throw new Error(v.message)
         this.__fens__ = [fen]
         this.__sans__ = ['']
+        this.__headers__ = {
+            Event: 'Internet Game',
+            Site: 'The Cloud, INTERNET',
+            Date: pgnDate(new Date()),
+            Round: '?',
+            White: 'White Player',
+            Black: 'Black Player',
+            Result: '*'
+        }
+        return this
     }
 
     load(fen) {
-        this.reset(fen)
+        if (!validateFen(fen).valid) return null
+        this.__sans__ = [fen]
+        this.__sans__ = ['']
+        return this
     }
 
     ascii(fennum , flipped = false) {
@@ -930,9 +959,170 @@ class Chess {
         return `${separ}${asciiArray.join('')}${bottomLine}`
     }
 
+    console_view(fennum, flipped = false) {
+        fennum = fennum || this.fens().length - 1
+        console.log(this.ascii(fennum, flipped))
+    }
+
     clear() {
         this.__fens__ = [...this.__fens__.slice(0, -1), clear(this.__fens__[this.__fens__.length -1])]
         return this
+    }
+
+    san_with_number(number, all = false) {
+        if (number < 1 || number > (this.__sans__.length - 1)) return ''
+        const {turn, fullMoveNumber} = fen2obj(this.fens()[number - 1])
+        let prefix
+        if (turn === 'w') {
+            prefix = `${fullMoveNumber}. `
+        } else {
+            prefix = all ? `${fullMoveNumber}. ... ` : ''
+        }
+        const san = this.history()[number - 1]
+
+        return `${prefix}${san}`
+    }
+
+    numbered_history(all = false) {
+        return this.history().map((_, i) => this.san_with_number(i + 1, all))
+    } 
+
+    pgn_moves(sep = '\n', line_break = 16){
+        return partition(this.numbered_history(), line_break)
+        .map(a => a.join(' ')).join(sep) +
+        ' ' + this.headers('Result') + sep
+    }
+
+    pgn_headers(sep = '\n') {
+        const seven_tags = Chess.sevenTags()
+        const seven_lines = seven_tags.map( tag => `[${tag} "${this.headers(tag)}"]`)
+        const others = keys(this.headers()).filter(key => !seven_tags.find(v => v === key))
+        const other_lines = others.map( tag => `[${tag} "${this.headers(tag)}"]`).sort()
+        return seven_lines.join(sep) + sep + other_lines.join(sep) + sep + sep
+    }
+
+    pgn(sep = '\n') {
+        return `${this.pgn_headers(sep)}${this.pgn_moves(sep)}`
+    }
+
+    load_pgn(pgn) {
+        const strip_nums = text => text.replace(/\d+\.\s*(\.\.\.)?\s*/g, '')
+        const is_san = text => sanRegExp.test(text)
+        const is_result = text => !!Chess.results().find(r => r === text)
+
+        const states = [
+            'SCANNING',
+            'LABEL',
+            'VALUE',
+            'TOKEN',
+            'COMMENT',
+            'VARIANT'
+        ]
+
+        let state = 'SCANNING'
+        let prevState = state
+        let label = ''
+        let value = ''
+        let token = ''
+        let current = ''
+        let index = 0
+
+        pgn = strip_nums(pgn).replace(/\r/g, '\n')
+        const game = new Chess()
+
+        do {
+            current = pgn[index++]
+
+            switch (state) {
+               case states[0]: //'SCANNING' 
+                 if ('[' === current) {
+                     state = 'LABEL'
+                 } else if ('{' === current) {
+                     prev_state = state
+                     state = 'COMMENT'
+                 } else if ('(' === current) {
+                    prevState = state
+                    state = 'VARIANT'
+                 } else if (current.match(/[\s\]]/)) {
+                    continue
+                 } else {
+                     prevState = state
+                     state = 'TOKEN'
+                     token = current
+                 }
+                 continue
+               case states[1]: //'LABEL' 
+                 if ('"' === current) {
+                     state = 'VALUE'
+                 } else {
+                    label += current
+                 }
+                 continue
+               case states[2]: //'VALUE' 
+                 if (/[\"\]]/.test(current)) {
+                    game.headers(capitalize(label.trim()), value)
+                    if (label.toLowerCase() === 'fen') {
+                        if (!game.load(value)) return false
+                        game.headers('SetUp', '1')
+                    }
+                    label = ''
+                    value = ''
+                    state = 'SCANNING'
+                 } else {
+                     value += current
+                 }
+                 continue
+               case states[3]: //'TOKEN' 
+                 if ('{' === current) {
+                     prevState = state
+                     state = 'COMMENT'
+                 } else if ('(' === current) {
+                     prevState = state
+                     state = 'VARIANT'
+                 } else if (current.match(/[\s\[]/)) {
+                     if (is_result(token)) {
+                         game.headers('Result', token)
+                     }
+                     if (is_result(token) || current === '[') {
+                        this.__headers__ = game.__headers__
+                        this.__fens__ = game.__fens__
+                        this.__sans__ = game.__sans__
+                        return true
+                     }
+                     if (is_san(token)) {
+                         const result = game.move(token)
+                         if (!result) {
+                             console.log(`${token} move failed to load.`)
+                             return false
+                         }
+                         token = ''
+                         prevState = 'TOKEN'
+                         state = 'SCANNING'
+                     }
+                 } else {
+                     token += current
+                 }
+                 continue
+               case states[4]: //'COMMENT' 
+                 if ('}' === current) {
+                    state = prevState
+                 }
+                 continue
+               case states[5]: //'VARIANT' 
+                 if (')' === current) {
+                    state = prevState
+                 }
+                 continue
+               default:
+                 continue
+            }
+
+        } while (index < pgn.length)
+
+        this.__headers__ = game.__headers__
+        this.__fens__ = game.__fens__
+        this.__sans__ = game.__sans__
+        return true
     }
 
     move(...moveArgs) {
@@ -1000,9 +1190,10 @@ class Chess {
         
         this.__sans__ = [...this.__sans__, {...newSanObj, flags}]
         this.__fens__ = [...this.__fens__, newFen]
+        this.headers('PlyCount', this.history().length.toString())
 
-        setTimeout(() => {
-        }, 0)
+        // setTimeout(() => {
+        // }, 0)
 
         return this
     }
@@ -1021,7 +1212,33 @@ class Chess {
             availableMoves(this.fen).map(it => args2san(this.fen, it.from, it.to, 'Q')) 
     }
     
-    get version() {return '0.9.6'}
+    headers(...args) {
+        if (!args.length) return this.__headers__
+        if (args.length === 1) return this.__headers__[capitalize(args[0])] || 'Header not set'
+        const evenargs = args.length % 2 === 0 ? args : args.slice(0, -1)
+        for (let x = 0; x < evenargs.length; x += 2) {
+            this.__headers__[capitalize(evenargs[x])] = evenargs[x + 1]
+        }
+        return this.__headers__
+    }
+
+    in_check() {return this.isCheck}
+    
+    in_checkmate() {return this.isCheckMate}
+
+    in_stalemate() {return this.isStaleMate}
+
+    get version()  {
+        if (typeof require !== 'undefined') {
+            return require('../package.json').version
+        } else {
+            return '1.0.0'
+        }
+    }
+
+    get turn() {
+        return fen2obj(this.fen).turn
+    }
 
     get in_fifty_moves_rule() {
         return parseInt(fen2obj(this.fen).halfMoveClock) >= 100
@@ -1058,6 +1275,10 @@ class Chess {
         return this.__fens__[this.__fens__.length -1]
     }
 
+    get position() {
+        return fen2obj(this.fen).fenArray
+    }
+
     get isCheck() {
         return isCheck(this.fen)
     }
@@ -1089,12 +1310,27 @@ class Chess {
         return this
     }
 
+    remove(sq) {
+        const figure = this.get(sq)
+        this.put(sq, '0')
+        return figure
+    }
+
+    static validate_fen(fen) {
+        return validateFen(fen)
+    }
+
+    static square_color(sq) {
+        return isLightSquare(sqNumber(sq)) ? 'light' : 'dark'
+    }
+
     fens() { return this.__fens__}
 
     undo() {
         if (this.__fens__.length < 2) return false
         this.__fens__.splice(this.__fens__.length - 1, this.__fens__.length)
         this.__sans__.splice(this.__sans__.length - 1, this.__sans__.length)
+        this.headers('PlyCount', this.history().length.toString())
         return this
     }
 
@@ -1104,6 +1340,9 @@ class Chess {
 }
 
 const thisExports = {
+    lpad,
+    rpad,
+    capitalize,
     groupArray,
     makeSet,
     range,
@@ -1120,6 +1359,7 @@ const thisExports = {
     prePastorFen,
     pastorFen,
 
+    pgnDate,
     makeFenComparable,
     fen2obj,
     obj2fen,

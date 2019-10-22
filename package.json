@@ -1,6 +1,6 @@
 {
   "name": "chess-functions",
-  "version": "0.9.6",
+  "version": "0.9.8",
   "author": "Domingo E. Savoretti <esavoretti@gmail.com>",
   "main": "dist/index.js",
   "files": [
@@ -15,8 +15,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "parcel build index.js",
+    "build": "parcel build src/index.js && cp src/index.html dist/index.html",
     "watch": "parcel watch index.html",
-    "clean": "rm dist/*"
+    "clean": "rm -r ./dist/"
   }
 }

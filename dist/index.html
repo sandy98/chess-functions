@@ -14,7 +14,12 @@
 </head>
 <body>
     <h1 class="mainheader">Prueba funciones base ajedrez</h1>
+    <div><span>Chess functions version </span> <span id="version"></span></div>
     <script src="index.js">
+    </script>
+    <script>
+        var game = new Chess();
+        document.getElementById('version').innerHTML = game.version;        
     </script>
 </body>
 </html>
