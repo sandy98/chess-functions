@@ -918,6 +918,28 @@ class Chess {
     }
 
     static results() { return ["*", "1-0", "0-1", "1/2-1/2"]}
+    static result_names() { return ["undefined", "white", "black", "draw"]}
+
+    static getUndefinedString() {return Chess.results()[Chess.result_names().findIndex(v => v === 'undefined')]}
+    static getWhiteWinString() {return Chess.results()[Chess.result_names().findIndex(v => v === 'white')]}
+    static getBlackWinString() {return Chess.results()[Chess.result_names().findIndex(v => v === 'black')]}
+    static getDrawString() {return Chess.results()[Chess.result_names().findIndex(v => v === 'draw')]}
+
+    static getResultString(game) {
+        if (!game.game_over) {
+            return Chess.getUndefinedString()
+        } else if (game.in_draw)  {
+            return Chess.getDrawString()
+        } else if (game.isCheckMate) {
+            if (game.turn === 'w') {
+                return Chess.getBlackWinString()
+            } else {
+                return Chess.getWhiteWinString()
+            }
+        } else {
+            return Chess.getUndefinedString()
+        }
+    }
 
     reset(fen = defaultFen) {
         const v = validateFen(fen)
@@ -931,15 +953,20 @@ class Chess {
             Round: '?',
             White: 'White Player',
             Black: 'Black Player',
-            Result: '*'
+            Result: Chess.getResultString(this)
+        }
+        if (fen !== defaultFen) {
+            this.headers('FEN', fen, 'SetUp', '1')
         }
         return this
     }
 
     load(fen) {
         if (!validateFen(fen).valid) return null
-        this.__sans__ = [fen]
+        this.__fens__ = [fen]
         this.__sans__ = ['']
+        this.headers('Result', Chess.getResultString(this), 'FEN', fen, 'SetUp', '1')
+        delete this.__headers__.PlyCount
         return this
     }
 
@@ -1006,8 +1033,8 @@ class Chess {
         return seven_lines.join(sep) + sep + other_lines.join(sep) + sep + sep
     }
 
-    pgn(sep = '\n') {
-        return `${this.pgn_headers(sep)}${this.pgn_moves(sep)}`
+    pgn(sep = '\n', line_break = 16) {
+        return `${this.pgn_headers(sep)}${this.pgn_moves(sep, line_break)}`
     }
 
     load_pgn(pgn) {
@@ -1195,7 +1222,7 @@ class Chess {
         
         this.__sans__ = [...this.__sans__, {...newSanObj, flags}]
         this.__fens__ = [...this.__fens__, newFen]
-        this.headers('PlyCount', this.history().length.toString())
+        this.headers('PlyCount', this.history().length.toString(), 'Result', Chess.getResultString(this))
 
         // setTimeout(() => {
         // }, 0)
@@ -1235,9 +1262,10 @@ class Chess {
 
     get version()  {
         if (typeof require !== 'undefined') {
-            return require('../package.json').version
+            const v = require('../package.json').version
+            return v ? v : '0.10.3'
         } else {
-            return '1.0.0'
+            return '0.10.3'
         }
     }
 
@@ -1335,7 +1363,7 @@ class Chess {
         if (this.__fens__.length < 2) return false
         this.__fens__.splice(this.__fens__.length - 1, this.__fens__.length)
         this.__sans__.splice(this.__sans__.length - 1, this.__sans__.length)
-        this.headers('PlyCount', this.history().length.toString())
+        this.headers('PlyCount', this.history().length.toString(), 'Result', Chess.getResultString(this))
         return this
     }
 
