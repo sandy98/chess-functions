@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Chess functions test</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div id="app">
+  <p id="version"></p>
+  <hr/>
+  <p id="moves">
+  </p>
+  <hr/>
+  <p> 
+    <span id="fen"></span>
+    <span>
+      &nbsp; &nbsp; &nbsp;
+      <input type="checkbox" id="chk-check"/>
+      <label> is Check </label>
+    </span>
+    <span>
+      &nbsp; &nbsp; &nbsp;
+      <input type="checkbox" id="chk-checkmate" />
+      <label> is CheckMate </label>
+    </span>
+  </p>
+  <hr/>
+  <p>
+    <label for="txt-san">Move &nbsp; &nbsp; &nbsp;</label>
+    <input type="text" id="txt-san" style="width: 3em;"/>
+     &nbsp; &nbsp; &nbsp;
+    <label>Available Moves</label>
+    &nbsp;
+    <span id="avail-moves" class="move-list">
+    </span>
+   </p>
+   <p style="margin-top: 0.5em;">
+      <button id="btn-undo">Undo move</button>
+       &nbsp; &nbsp; &nbsp;
+      <button id="btn-reset">Reset game</button>
+   </p>
+  </p>
+  <hr/>
+  <div>
+    <button id="ascii">Show Ascii</button>    
+    <button id="pgn">Show PGN</button>
+  </div>
+</div>
+<!-- partial -->
+<script src='https://cdn.jsdelivr.net/npm/chess-functions@0.10.4'></script><script  src="./script.js"></script>
+
+</body>
+</html>

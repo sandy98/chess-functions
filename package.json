@@ -1,6 +1,6 @@
 {
   "name": "chess-functions",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "author": "Domingo E. Savoretti <esavoretti@gmail.com>",
   "main": "dist/index.js",
   "files": [
