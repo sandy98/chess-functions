@@ -1272,9 +1272,9 @@ class Chess {
     get version()  {
         if (typeof require !== 'undefined') {
             const v = require('../package.json').version
-            return v ? v : '0.10.5'
+            return v ? v : '0.10.6'
         } else {
-            return '0.10.5'
+            return '0.10.6'
         }
     }
 
