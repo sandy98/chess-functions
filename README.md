@@ -9,4 +9,4 @@
   Chess functions test</a> by Domingo E. Savoretti (<a href="https://codepen.io/sandyrosario">@sandyrosario</a>)
   on <a href="https://codepen.io">CodePen</a>.</span>
 </p>
-<script async src="https://static.codepen.io/assets/embed/ei.js"></script>
+<!--<script async src="https://static.codepen.io/assets/embed/ei.js"></script>-->
