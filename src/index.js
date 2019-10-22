@@ -997,8 +997,11 @@ class Chess {
         const seven_tags = Chess.sevenTags()
         const seven_lines = seven_tags.map( tag => `[${tag} "${this.headers(tag)}"]`)
         let others = [] 
-        for (key in this.headers()) others = [...others, key]
-        others.filter(key => !seven_tags.find(v => v === key))
+        for (let key in this.headers()) {
+            if (typeof seven_tags.find(tag => tag === key) === 'undefined') {
+                others = [...others, key]
+            }
+        }
         const other_lines = others.map( tag => `[${tag} "${this.headers(tag)}"]`).sort()
         return seven_lines.join(sep) + sep + other_lines.join(sep) + sep + sep
     }
