@@ -10,10 +10,10 @@
 <!-- partial:index.partial.html -->
 <div id="app">
   <p id="version"></p>
-  <hr/>
+  <!--<hr/>-->
   <p id="moves">
   </p>
-  <hr/>
+  <!--<hr/>-->
   <p> 
     <span id="fen"></span>
     <span>
@@ -27,7 +27,7 @@
       <label> is CheckMate </label>
     </span>
   </p>
-  <hr/>
+  <!--<hr/>-->
   <p>
     <label for="txt-san">Move &nbsp; &nbsp; &nbsp;</label>
     <input type="text" id="txt-san" style="width: 3em;"/>
@@ -41,16 +41,19 @@
       <button id="btn-undo">Undo move</button>
        &nbsp; &nbsp; &nbsp;
       <button id="btn-reset">Reset game</button>
+       &nbsp; &nbsp; &nbsp;
+      <button id="pgn">Show PGN</button>
+      &nbsp; &nbsp; &nbsp;
+     <input type="checkbox" id="chk-flipped">
+     &nbsp;
+     <label id="lbl-flipped">Flip/UnFlip Board</label>
    </p>
   </p>
-  <hr/>
-  <div>
-    <button id="ascii">Show Ascii</button>    
-    <button id="pgn">Show PGN</button>
-  </div>
+  <!--<hr/>-->
+  <div id="board"></div>
 </div>
 <!-- partial -->
-<script src='https://cdn.jsdelivr.net/npm/chess-functions@0.10.4'></script><script  src="./script.js"></script>
+  <script src='https://cdn.jsdelivr.net/npm/chess-functions@0.10.4'></script><script  src="./script.js"></script>
 
 </body>
 </html>

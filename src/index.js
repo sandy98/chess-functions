@@ -750,7 +750,7 @@ const san2args = (fen, san) => {
             //console.log('san length 5')
             sqFrom = san2sq(san.slice(1, 3))
         } else if (san.length === 4) {
-          console.log('san length 4')
+          // console.log('san length 4')
           const extraInfo = san[1]
           const [rowOrColFunc, geoInfo] = /[1-8]/.test(extraInfo) ? 
                                           [row, parseInt(extraInfo) - 1] : 
@@ -1066,6 +1066,7 @@ class Chess {
         let value = ''
         let token = ''
         let current = ''
+        let header_result = null
         let index = 0
 
         pgn = strip_nums(pgn).replace(/\r/g, '\n')
@@ -1106,6 +1107,9 @@ class Chess {
                         if (!game.load(value)) return false
                         game.headers('SetUp', '1')
                     }
+                    if (label.toLowerCase() === 'result') {
+                        header_result = value
+                    }
                     label = ''
                     value = ''
                     state = 'SCANNING'
@@ -1125,6 +1129,11 @@ class Chess {
                          game.headers('Result', token)
                      }
                      if (is_result(token) || current === '[') {
+                        if (is_result(token)) { 
+                            game.headers('Result', token) 
+                        } else if (header_result) {
+                            game.headers('Result', header_result)
+                        }
                         this.__headers__ = game.__headers__
                         this.__fens__ = game.__fens__
                         this.__sans__ = game.__sans__
@@ -1160,6 +1169,9 @@ class Chess {
 
         } while (index < pgn.length)
 
+        if (header_result) {
+            game.headers('Result', header_result)
+        }
         this.__headers__ = game.__headers__
         this.__fens__ = game.__fens__
         this.__sans__ = game.__sans__
@@ -1272,9 +1284,9 @@ class Chess {
     get version()  {
         if (typeof require !== 'undefined') {
             const v = require('../package.json').version
-            return v ? v : '0.10.6'
+            return v ? v : '0.10.7'
         } else {
-            return '0.10.6'
+            return '0.10.7'
         }
     }
 

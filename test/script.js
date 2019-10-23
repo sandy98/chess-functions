@@ -1,10 +1,6 @@
 const g = new Chess();
 showValues();
 
-function showAscii() {
-  alert(g.mini_ascii());
-};
-
 function showPgn() {
   alert(g.pgn());
 }
@@ -40,10 +36,12 @@ function showValues() {
   document.querySelector('#chk-checkmate').checked = g.isCheckMate;
   document.querySelector('#avail-moves').innerText = g.moves().join(' - ');
   document.querySelector('#btn-undo').disabled = g.history().length < 1;
+  document.querySelector('#board').innerHTML = g.mini_ascii(null, document.querySelector('#chk-flipped').checked).replace(/\\n/g, '<br/>').replace(/ /g, '&nbsp;');
+  document.querySelector('#lbl-flipped').innerText = document.querySelector('#chk-flipped').checked ? 'Unflip board' : 'Flip board';
 }
 
-document.querySelector('#ascii').addEventListener('click', showAscii);
 document.querySelector('#pgn').addEventListener('click', showPgn);
 document.querySelector('#txt-san').addEventListener('change', doMove);
 document.querySelector('#btn-undo').addEventListener('click', undoMove);
 document.querySelector('#btn-reset').addEventListener('click', resetGame);
+document.querySelector('#chk-flipped').addEventListener('change', showValues);
