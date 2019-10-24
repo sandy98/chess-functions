@@ -408,7 +408,18 @@ const attacksFromSq = (fen, sq) => {
             filterFunc = isKingMove
             break
         default: 
-            return fig === 'p' ? [sq - 7, sq - 9] : [sq + 7, sq + 9]
+            // return fig === 'p' ? [sq - 7, sq - 9] : [sq + 7, sq + 9]
+            if (fig === 'p') {
+                if (col(sq) === 0) return [sq - 7]
+                if (col(sq) === 7) return [sq - 9]
+                return [sq - 7, sq - 9]
+            } else if (fig === 'P') {
+                if (col(sq) === 0) return [sq + 9]
+                if (col(sq) === 7) return [sq + 7]
+                return [sq + 7, sq + 9]
+            } else {
+                return []
+            }
         }
 
         const candidatesArr = chessboard.filter( n => filterFunc(sq, n))
@@ -474,6 +485,9 @@ const isCheckMateOld = fen => {
 }
 
 const canKingMove = (fen, sqFrom, sqTo, king) => {
+    sqFrom = sqNumber(sqFrom)
+    sqTo = sqNumber(sqTo)
+    
     const {castling, turn, fenArray} = fen2obj(fen)
     const friend = king === 'k' ? 'b' : 'w'
     const foe = king === 'k' ? 'w' : 'b'
@@ -1284,9 +1298,9 @@ class Chess {
     get version()  {
         if (typeof require !== 'undefined') {
             const v = require('../package.json').version
-            return v ? v : '0.10.7'
+            return v ? v : '0.10.8'
         } else {
-            return '0.10.7'
+            return '0.10.8'
         }
     }
 
