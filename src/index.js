@@ -485,6 +485,12 @@ const isCheckMateOld = fen => {
 }
 
 const canKingMove = (fen, sqFrom, sqTo, king) => {
+    if (king === 'k' || king === 'b') {
+        king = 'k'
+    } else if (king === 'K' || king === 'w') {
+        king = 'K'
+    }
+    
     sqFrom = sqNumber(sqFrom)
     sqTo = sqNumber(sqTo)
     
@@ -1298,9 +1304,9 @@ class Chess {
     get version()  {
         if (typeof require !== 'undefined') {
             const v = require('../package.json').version
-            return v ? v : '0.10.8'
+            return v ? v : '0.11.9'
         } else {
-            return '0.10.8'
+            return '0.11.9'
         }
     }
 
