@@ -933,6 +933,8 @@ class Chess {
         return this.reset(fen)
     }
     
+    static defaultFen() {return defaultFen}
+
     static sevenTags() {
         return ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result']
     }
@@ -1304,9 +1306,9 @@ class Chess {
     get version()  {
         if (typeof require !== 'undefined') {
             const v = require('../package.json').version
-            return v ? v : '0.11.9'
+            return v ? v : '0.12.0'
         } else {
-            return '0.11.9'
+            return '0.12.0'
         }
     }
 
