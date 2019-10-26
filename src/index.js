@@ -1306,9 +1306,9 @@ class Chess {
     get version()  {
         if (typeof require !== 'undefined') {
             const v = require('../package.json').version
-            return v ? v : '0.12.0'
+            return v ? v : '0.12.1'
         } else {
-            return '0.12.0'
+            return '0.12.1'
         }
     }
 
@@ -1349,6 +1349,10 @@ class Chess {
     
     get fen() {
         return this.__fens__[this.__fens__.length -1]
+    }
+
+    set fen(newFen =  Chess.defaultFen()) {
+        this.load(newFen)
     }
 
     get position() {
