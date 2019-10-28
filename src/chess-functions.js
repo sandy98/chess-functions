@@ -233,8 +233,8 @@ const isClearPath = (fen, pth) => {
     const fenArr = arrayFromFen(fen)
     const iPath = innerPath(pth)
 
-    for (let v of iPath) {
-        if (fenArr[v] !== '0') {
+    for (let i in iPath) {
+        if (fenArr[iPath[i]] !== '0') {
             return false
         }
     }
@@ -306,9 +306,9 @@ const isCastling = (sqFrom, sqTo, colour = 'w') => {
 const army = (fen, fig) => {
     const fenArr = fen2array(fen)
     let ret = []
-    for (let v of chessboard) {
-        if (fenArr[v] === fig) {
-            ret = [...ret, v]
+    for (let i in chessboard) {
+        if (fenArr[chessboard[i]] === fig) {
+            ret = [...ret, chessboard[i]]
         }
     }
     return ret
@@ -382,7 +382,8 @@ const getFigures = (fen, path) => path.map( n => {
     const obj = {}
     obj[n] = getFigure(fen, n)
     return obj
-}).reduce((el1, el2) => ({...el1, ...el2}), {})
+//}).reduce((el1, el2) => ({...el1, ...el2}), {})
+}).reduce((el1, el2) => Object.assign(el1, el2), {})
 
 const attacksFromSq = (fen, sq) => {
     const fenArr = arrayFromFen(fen)
@@ -472,9 +473,9 @@ const isCheckMateOld = fen => {
         for (let pair of filtered) {
             const newPair = [pair[0], pair[1].filter(v => checkPath.find(n => n === v))]
             //console.log(`New Pair: ${JSON.stringify(newPair)}`)
-            for (let v of pair[1]) {
+            for (let i in pair[1]) {
                 //console.log(`pair[0]: ${pair[0]} , v: ${v}`)
-                const newFen = tryMove(fen, pair[0], v, 'Q')
+                const newFen = tryMove(fen, pair[0], pair[1][i], 'Q')
                 //console.log(`newFen: ${newFen}`)
                 if (newFen && validateFen(newFen).valid) return false
             }
@@ -610,7 +611,8 @@ const candidateMoves = fen => {
 
 const availableMoves = fen => {
     let retArr = []
-    for (let item of candidateMoves(fen)) {
+    const candMoves = candidateMoves(fen)
+    for (let item of candMoves) {
         for (let sq of item[1]) {
             const newFen = tryMove(fen, item[0], sq, 'Q')
             if (newFen && validateFen(newFen).valid) retArr = [...retArr, {from: item[0], to: sq}]
@@ -1243,13 +1245,16 @@ class Chess {
                          color: turn, 
                          from: sq2san(sqFrom), 
                          to: sq2san(sqTo)}
-        if (!isEmptyFigure(figTo)) newSanObj = {...newSanObj, captured: figTo}
+//        if (!isEmptyFigure(figTo)) newSanObj = {...newSanObj, captured: figTo}
+        if (!isEmptyFigure(figTo)) newSanObj = Object.assign(newSanObj, {captured: figTo})
         const isEnPassant = /[Pp]/.test(figFrom) && sqTo === san2sq(enPassant)
         const isBigPawn = /[Pp]/.test(figFrom) && difRow(sqFrom, sqTo) === 2
         const isPromotion = (figFrom === 'p' && row(sqTo) === 0) ||
                             (figFrom === 'P' && row(sqTo) === 7)
-        if (isPromotion) newSanObj = {...newSanObj, promotion: promotion ? 
-                                      promotion.toUpperCase() : 'Q'}
+//        if (isPromotion) newSanObj = {...newSanObj, promotion: promotion ? 
+//                                      promotion.toUpperCase() : 'Q'}
+        if (isPromotion) newSanObj = Object.assign(newSanObj, 
+            {promotion: promotion ? promotion.toUpperCase() : 'Q'})
         let flags = ''
         if ((figFrom === 'K' && sqFrom === 4 && sqTo === 6) || (figFrom === 'k' && sqFrom === 60 && sqTo === 62)) {
             flags += 'k'
@@ -1263,7 +1268,8 @@ class Chess {
         }
         flags += isEnPassant ? 'e' : newSanObj.captured ? 'c' : 'n'
         
-        this.__sans__ = [...this.__sans__, {...newSanObj, flags}]
+//        this.__sans__ = [...this.__sans__, {...newSanObj, flags}]
+        this.__sans__ = [...this.__sans__, Object.assign(newSanObj, {flags})]
         this.__fens__ = [...this.__fens__, newFen]
         this.headers('PlyCount', this.history().length.toString(), 'Result', Chess.getResultString(this))
 
@@ -1304,12 +1310,15 @@ class Chess {
     in_stalemate() {return this.isStaleMate}
 
     get version()  {
+      /*
         if (typeof require !== 'undefined') {
             const v = require('../package.json').version
-            return v ? v : '0.12.1'
+            return v ? v : '0.12.3'
         } else {
-            return '0.12.1'
+            return '0.12.3'
         }
+      */
+      return '0.12.3'
     }
 
     get turn() {
@@ -1541,7 +1550,7 @@ catch(e) {
     console.log(`EXPORT (1) ERROR: ${e.message}`)
 }
 
-*/
+
 
 if (typeof window !== 'undefined') {
     window.Chess = Chess
@@ -1562,7 +1571,7 @@ catch(e) {
     console.log(`EXPORT (2) ERROR: ${e.message}`)
 }
 
-/*
+
 try {
     if (window) window.base_chess_functions = this.exports
 }
@@ -1571,3 +1580,5 @@ catch(e) {
 }
 
 */
+
+export default Chess

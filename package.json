@@ -1,8 +1,9 @@
 {
   "name": "chess-functions",
-  "version": "0.12.1",
+  "version": "0.12.3",
   "author": "Domingo E. Savoretti <esavoretti@gmail.com>",
-  "main": "dist/index.js",
+  "repository": "https://github.com/sandy98/chess-functions",
+  "main": "dist/chess-rules.min.js",
   "files": [
     "dist/"
   ],
@@ -15,8 +16,12 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "parcel build src/index.js && cp src/index.html dist/index.html",
-    "watch": "parcel watch index.html",
-    "clean": "rm -r ./dist/"
+    "build": "rollup -c && uglifyjs dist/chess-functions.js -o dist/chess-functions.min.js && rollup -c rollup.config.esm.js && cp dist/chess-functions.min.js test/chess-functions.js",
+    "clean": "rm -r dist/* && rm test/chess-functions.js"
+  },
+  "devDependencies": {
+    "rollup": "^1.26.0",
+    "rollup-plugin-buble": "latest",
+    "uglify-js": "^3.6.4"
   }
 }
