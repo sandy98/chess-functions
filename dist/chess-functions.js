@@ -1320,7 +1320,7 @@
     Chess.prototype.in_stalemate = function in_stalemate () {return this.isStaleMate};
 
     prototypeAccessors.title.get = function () {
-        return ((this.headers('White')) + " - " + (this.headers('Black')) + "   " + (this.headers('Result')))
+        return ((this.headers('White')) + " - " + (this.headers('Black')) + "   /   " + (this.headers('Result')))
     };
 
     prototypeAccessors.version.get = function (){

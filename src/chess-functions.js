@@ -1310,7 +1310,7 @@ class Chess {
     in_stalemate() {return this.isStaleMate}
 
     get title() {
-        return `${this.headers('White')} - ${this.headers('Black')}   ${this.headers('Result')}`
+        return `${this.headers('White')} - ${this.headers('Black')}   /   ${this.headers('Result')}`
     }
 
     get version()  {

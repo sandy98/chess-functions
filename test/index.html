@@ -12,6 +12,7 @@
     <h1 class="steelblue centered">Chess Functions test</h1>
     <p>Version: <span id="version"></span></p>
     <hr/>
+    <div class="row" id="game-title"></div>
     <div class="row" id="fen"></div>
     <div id="board" class="board row"></div>
     <div id="move-list" class="row"></div>
@@ -69,6 +70,7 @@
     <script>
         function showValues() {
         document.querySelector('#version').innerText = game.version
+        document.querySelector('#game-title').innerText = game.title
         document.querySelector('#board').innerHTML = 
             game.mini_ascii(null, document.querySelector('#chk-flipped').checked).replace(/ /g, '&nbsp;').replace(/\\n/g, '</br>')
         document.querySelector('#btn-undo').disabled = game.history().length < 1;
@@ -136,7 +138,7 @@
         document.querySelector('#chk-flipped').addEventListener('change', showValues);
 
         var game = new Chess()
-        
+
         showValues()    
   </script>
   
