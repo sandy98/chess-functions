@@ -1323,7 +1323,7 @@ class Chess {
             return '0.12.3'
         }
       */
-      return '0.12.9'
+      return '0.13.1'
     }
 
     get turn() {
@@ -1372,7 +1372,11 @@ class Chess {
     get position() {
         return fen2obj(this.fen).fenArray
     }
-
+    
+    get positions() {
+	return this.__fens__.map(fen => fen2obj(fen).fenArray)
+    }
+    
     get isCheck() {
         return isCheck(this.fen)
     }
