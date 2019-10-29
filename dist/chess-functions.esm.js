@@ -1322,7 +1322,7 @@ var prototypeAccessors = { version: { configurable: true },turn: { configurable:
           return '0.12.3'
       }
     */
-    return '0.12.3'
+    return '0.12.5'
   };
 
   prototypeAccessors.turn.get = function () {

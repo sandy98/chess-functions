@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+
+cd scripts
+
+export VERSION=`node -e 'console.log(require("../package.json").version)'`
+
+clear
+
+echo "Building Library version: $VERSION"
+echo "-------- ------- -------- -----------"
+echo ""
+#node -e 'console.log(`Library version inside node: ${process.env.VERSION}`)'
+
+cd ..
+
+echo "Building chess-functions.js..." &&
+rollup -c && 
+echo "Minifying chess-functions.js to chess-functions.min.js..." &&
+uglifyjs dist/chess-functions.js -o dist/chess-functions.min.js && 
+echo "Building chess-functions.esm.js, ES6 (import/export) version..." &&
+rollup -c rollup.config.esm.js && 
+echo "Copying js library to test directory..."
+cp dist/chess-functions.min.js test/chess-functions.js
