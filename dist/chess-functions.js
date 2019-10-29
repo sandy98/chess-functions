@@ -1330,10 +1330,10 @@
             const v = require('../package.json').version
             return v ? v : '0.12.3'
         } else {
-            return '0.12.3'
+            return '0.13.2'
         }
       */
-      return '0.13.1'
+      return '0.13.2'
     };
 
     prototypeAccessors.turn.get = function () {

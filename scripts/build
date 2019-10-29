@@ -12,7 +12,10 @@ echo ""
 #node -e 'console.log(`Library version inside node: ${process.env.VERSION}`)'
 
 cd ..
-
+echo 'Updating version number in README.md ...'
+sed -r -i "s:(v\.\s+)([0-9]+\.[0-9]+\.[0-9]+):\1$VERSION:" README.md
+echo 'Updating version number in src/chess-functions.js ...'
+sed -r -i "s:(return\s+)'([0-9]+\.[0-9]+\.[0-9]+)':\1'$VERSION':" src/chess-functions.js
 echo "Building chess-functions.js..." &&
 rollup -c && 
 echo "Minifying chess-functions.js to chess-functions.min.js..." &&
