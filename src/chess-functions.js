@@ -1309,6 +1309,10 @@ class Chess {
 
     in_stalemate() {return this.isStaleMate}
 
+    get title() {
+        return `${this.headers('White')} - ${this.headers('Black')}   ${this.headers('Result')}`
+    }
+
     get version()  {
       /*
         if (typeof require !== 'undefined') {
@@ -1318,7 +1322,7 @@ class Chess {
             return '0.12.3'
         }
       */
-      return '0.12.7'
+      return '0.12.8'
     }
 
     get turn() {
