@@ -1,3 +1,4 @@
+/*
 .move-list {
   padding: 5px;
   border: solid 1px;
@@ -17,3 +18,42 @@
   background: steelblue;
   margin-left: 45%;
 }
+
+*/
+
+h1, h2, div {
+  font-family: Lato;
+}
+
+.centered {
+
+  text-align: center;
+}
+
+.steelblue {
+  color: steelblue;
+}
+
+.board {
+
+  padding: 0.5em;
+  border: solid 2px #111;
+  color: white;
+  background: steelblue;
+  width: 9em;
+  font-family: monospace;
+}
+
+.row {
+  margin-bottom: 10px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+div#status {
+  font-family: monospace;
+  font-size: 8pt;
+}
+

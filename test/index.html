@@ -1,60 +1,144 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Chess functions test</title>
-  <link rel="stylesheet" href="./style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chess Functions Test</title>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<!-- partial:index.partial.html -->
-<div id="app">
-  <p id="version"></p>
-  <!--<hr/>-->
-  <p id="moves">
-  </p>
-  <!--<hr/>-->
-  <p> 
-    <span id="fen"></span>
-    <span>
-      &nbsp; &nbsp; &nbsp;
-      <input type="checkbox" id="chk-check"/>
-      <label> is Check </label>
-    </span>
-    <span>
-      &nbsp; &nbsp; &nbsp;
-      <input type="checkbox" id="chk-checkmate" />
-      <label> is CheckMate </label>
-    </span>
-  </p>
-  <!--<hr/>-->
-  <p>
-    <label for="txt-san">Move &nbsp; &nbsp; &nbsp;</label>
-    <input type="text" id="txt-san" style="width: 3em;"/>
-     &nbsp; &nbsp; &nbsp;
-    <label>Available Moves</label>
-    &nbsp;
-    <span id="avail-moves" class="move-list">
-    </span>
-   </p>
-   <p style="margin-top: 0.5em;">
-      <button id="btn-undo">Undo move</button>
-       &nbsp; &nbsp; &nbsp;
+    
+    <h1 class="steelblue centered">Chess Functions test</h1>
+    <p>Version: <span id="version"></span></p>
+    <hr/>
+    <div class="row" id="fen"></div>
+    <div id="board" class="board row"></div>
+    <div id="move-list" class="row"></div>
+    <div id="status" class="row">
+      <span style="color: steelblue;">Status</span>
+      &nbsp;&nbsp;
+      <input type="checkbox" id="chk-check" disabled />
+      <label>Check</label>
+      &nbsp;
+      <input type="checkbox" id="chk-checkmate" disabled />
+      <label>CheckMate</label>
+      &nbsp;
+      <input type="checkbox" id="chk-stalemate" disabled />
+      <label>StaleMate</label>
+      &nbsp;
+      <input type="checkbox" id="chk-reps" disabled />
+      <label>3 Reps</label>
+      <br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <input type="checkbox" id="chk-insuf" disabled />
+      <label>Low Material</label>
+      &nbsp;
+      <input type="checkbox" id="chk-draw" disabled />
+      <label>Draw</label>
+      &nbsp;
+      <input type="checkbox" id="chk-over" disabled />
+      <label>Game Over</label>
+      &nbsp;
+    <div>
+    <div class="row" style="margin-top: 10px;">
+      <span style="color: steelblue;">Available moves:</span>
+      &nbsp;&nbsp;&nbsp;
+      <span id="moves" style="font-size: 8pt;"></span>
+    </div>
+    <hr/>
+    <div class="row">
+      <label for="txt-san">Move</label>
+      &nbsp;&nbsp;&nbsp;
+      <input style="width: 3em; text-align: right;" type="text" id="txt-san" />
+      &nbsp;&nbsp;&nbsp;
+      <button id="btn-undo">Undo</button>
+      &nbsp;&nbsp;&nbsp;
       <button id="btn-reset">Reset game</button>
-       &nbsp; &nbsp; &nbsp;
-      <button id="pgn">Show PGN</button>
-      &nbsp; &nbsp; &nbsp;
-     <input type="checkbox" id="chk-flipped">
-     &nbsp;
-     <label id="lbl-flipped">Flip/UnFlip Board</label>
-   </p>
-  </p>
-  <!--<hr/>-->
-  <div id="board"></div>
-</div>
-<!-- partial -->
-  <script src='chess-functions.js'></script>
-  <script  src="./script.js"></script>
+      &nbsp;&nbsp;&nbsp;
+      <button id="btn-load-fen">Load FEN</button>
+    </div>
+    <div class="row">
+      <button id="btn-pgn">Show PGN</button>
+      &nbsp;&nbsp;&nbsp;
+      <input type="checkbox" id="chk-flipped" class="pointer">
+      <label id="lbl-flipped" for="chk-flipped" class="pointer"></label>
+    </div>
 
+    <script src='chess-functions.js'></script>
+    <script>
+        function showValues() {
+        document.querySelector('#version').innerText = game.version
+        document.querySelector('#board').innerHTML = 
+            game.mini_ascii(null, document.querySelector('#chk-flipped').checked).replace(/ /g, '&nbsp;').replace(/\\n/g, '</br>')
+        document.querySelector('#btn-undo').disabled = game.history().length < 1;
+        document.querySelector('#lbl-flipped').innerText = 
+            document.querySelector('#chk-flipped').checked ? "Unflip board" : "Flip Board"
+        document.querySelector('#fen').innerText = `FEN: ${game.fen}`
+        document.querySelector('#move-list').innerText = `Moves: ${game.pgn_moves()}`
+        document.querySelector('#moves').innerText = game.moves().join(' - ')
+        document.querySelector('#chk-check').checked = game.isCheck
+        document.querySelector('#chk-checkmate').checked = game.isCheckMate
+        document.querySelector('#chk-stalemate').checked = game.isStaleMate
+        document.querySelector('#chk-reps').checked = game.in_threefold_repetition
+        document.querySelector('#chk-draw').checked = game.in_draw
+        document.querySelector('#chk-over').checked = game.game_over
+        document.querySelector('#chk-insuf').checked = game.insufficient_material
+        //document.querySelector('#txt-san').focus()
+        }
+
+
+        function doMove(e) {
+        if (game.move(e.target.value)) {
+            showValues();
+        } else {
+            alert(`Wrong movement: ${e.target.value}`)
+        }
+        e.target.value = ''
+        }
+
+        function undo() {
+        if (!game.undo()) {
+            alert('No movements to be undone.')
+        } else {
+            showValues();
+        }
+        document.querySelector('#txt-san').focus()  
+        }
+
+        function reset() {
+        game.reset()
+        showValues();
+        document.querySelector('#txt-san').focus()  
+        }
+
+        function showPgn() {
+        alert(game.pgn())
+        }
+
+        function load_fen() {
+        let fen = prompt("Input a position in Forsyte Edwards notation", game.fen)
+        if (fen) {
+            const resp = game.load(fen)
+            if (resp) {
+            showValues()
+            } else {
+            alert('Invalid FEN')
+            }
+        }
+        }
+
+        document.querySelector('#btn-undo').addEventListener('click', undo);
+        document.querySelector('#btn-reset').addEventListener('click', reset);
+        document.querySelector('#btn-load-fen').addEventListener('click', load_fen);
+        document.querySelector('#btn-pgn').addEventListener('click', showPgn);
+        document.querySelector('#txt-san').addEventListener('change', doMove);
+        document.querySelector('#chk-flipped').addEventListener('change', showValues);
+
+        var game = new Chess()
+        
+        showValues()    
+  </script>
+  
 </body>
 </html>
