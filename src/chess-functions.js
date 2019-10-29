@@ -1318,7 +1318,7 @@ class Chess {
             return '0.12.3'
         }
       */
-      return '0.12.5'
+      return '0.12.6'
     }
 
     get turn() {
