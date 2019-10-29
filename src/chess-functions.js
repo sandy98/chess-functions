@@ -935,6 +935,8 @@ class Chess {
         return this.reset(fen)
     }
     
+    static utils() {return utility_funcs}
+    
     static defaultFen() {return defaultFen}
 
     static sevenTags() {
@@ -1320,10 +1322,10 @@ class Chess {
             const v = require('../package.json').version
             return v ? v : '0.12.3'
         } else {
-            return '0.13.2'
+            return '0.13.3'
         }
       */
-      return '0.13.2'
+      return '0.13.3'
     }
 
     get turn() {
@@ -1447,7 +1449,7 @@ class Chess {
     }
 }
 
-const thisExports = {
+const utility_funcs = {
     lpad,
     rpad,
     capitalize,
@@ -1558,46 +1560,5 @@ const thisExports = {
     Chess,
 }
 
-const cf = thisExports
-
-/*
-
-try {
-    export default thisExports
-}
-catch(e) {
-    console.log(`EXPORT (1) ERROR: ${e.message}`)
-}
-
-
-
-if (typeof window !== 'undefined') {
-    window.Chess = Chess
-}
-
-if (typeof global !== 'undefined') {
-    global.Chess = Chess
-}
-
-try {
-    if (typeof module !== 'undefined') {
-        module.exports = Chess
-    } else {
-        const exports = Chess
-    }
-}
-catch(e) {
-    console.log(`EXPORT (2) ERROR: ${e.message}`)
-}
-
-
-try {
-    if (window) window.base_chess_functions = this.exports
-}
-catch(e) {
-    console.log(`WINDOW ERROR: ${e.message}`)
-}
-
-*/
 
 export default Chess

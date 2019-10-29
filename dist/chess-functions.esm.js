@@ -4,6 +4,12 @@ var lpad = function (stri, padChar, num) {
 
   return ("" + (padChar.repeat(num - stri.length)) + stri);
 };
+var rpad = function (stri, padChar, num) {
+  if ( padChar === void 0 ) padChar = '0';
+  if ( num === void 0 ) num = 2;
+
+  return ("" + stri + (padChar.repeat(num - stri.length)));
+};
 
 var capitalize = function (stri) { return ("" + (stri[0].toUpperCase()) + (stri.slice(1))); };
 
@@ -20,6 +26,8 @@ var groupArray = function (arr) {
         return base
     }, {})
 };
+
+var makeSet = function (arr) { return arr.reduce(function (b, el) { return b.find(function (el2) { return el2 === el; }) ? b : b.concat( [el]); }, []); };
 
 var range = function (start, end, step) {
     if ( start === void 0 ) start = 0;
@@ -52,8 +60,16 @@ var range = function (start, end, step) {
 var chessboard = range(0, 63);
 
 var sanRegExp = /(?:(^0-0-0|^O-O-O)|(^0-0|^O-O)|(?:^([a-h])(?:([1-8])|(?:x([a-h][1-8])))(?:=?([NBRQ]))?)|(?:^([NBRQK])([a-h])?([1-8])?(x)?([a-h][1-8])))(?:(\+)|(#)|(\+\+))?$/;
+var pgnTagLineRegExp = /^\s*\[\s*(.+?)\s+"(.+?)"\s*\]\s*$/;
 
 var defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+var sicilianFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 1';
+var scandinavianFen = 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2';
+var oddFrenchFen = 'rnbqkbnr/ppp2ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3';
+var mateLocoFen = 'rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3';
+var mateAyudadoFen = 'r1bqnNnr/pppkpp1p/7R/3p4/8/8/PPPPPPP1/RNBQKBN1 b Q - 0 6';
+var prePastorFen = 'r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4';
+var pastorFen = 'r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4';
 
 var fen2obj = function (fen) {
     var arr = fen.split(/\s+/);
@@ -110,6 +126,8 @@ var col2letter = function (c) { return String.fromCharCode(97 + c); };
 
 var letter2col = function (l) { return l.charCodeAt(0) - 97; };
 
+var sq2rowcol = function (sq) { return ({row: row(sq), col: col(sq)}); };
+
 var rowcol2sq = function (r, c) { return r * 8 + c; };
 
 var isBlackFigure = function (fig) { return /[pnbrqk]/.test(fig); };
@@ -144,6 +162,8 @@ var isAntiDiagonal = function (sq1, sq2) { return difCol(sq1, sq2) === difRow(sq
 
 var isKnightJump = function (sq1, sq2) { return (difCol(sq1, sq2) === 2  && difRow(sq1, sq2) === 1) ||
                                    (difCol(sq1, sq2) === 1  && difRow(sq1, sq2) === 2); }; 
+
+var isKingReach = function (sq1, sq2) { return difCol(sq1, sq2) < 2 && difRow(sq1, sq2) < 2; };
 
 var rowStep = 1;
 var colStep = 8;
@@ -333,7 +353,34 @@ var bArmy = function (fen) { return bPawns(fen).concat( bKnights(fen),
     bQueens(fen),
     bKings(fen) ); };
 
+var wAttackers = function (fen) { return wKnights(fen).concat( wBishops(fen),
+    wRooks(fen),
+    wQueens(fen) ); };
+
+var bAttackers = function (fen) { return bKnights(fen).concat( bBishops(fen),
+    bRooks(fen),
+    bQueens(fen) ); };
+
+var wAttacks = function (fen) { return wAttackers(fen).map(function (a) { return attacksFromSq(fen, a); }).reduce(function (a1, a2) { return a1.concat(a2); }, []); };
+var bAttacks = function (fen) { return bAttackers(fen).map(function (a) { return attacksFromSq(fen, a); }).reduce(function (a1, a2) { return a1.concat(a2); }, []); };
+
+var wPMoves = function (fen) { return wPawns(fen).map(function (p) { return chessboard.filter(function (n) { return canMove(fen, p, n); }); })
+                       .reduce(function (a1, a2) { return a1.concat(a2); }); };   
+
+var bPMoves = function (fen) { return bPawns(fen).map(function (p) { return chessboard.filter(function (n) { return canMove(fen, p, n); }); })
+                       .reduce(function (a1, a2) { return a1.concat(a2); }); };   
+
 var isFriend = function (fig1, fig2) { return (isBlackFigure(fig1) && isBlackFigure(fig2)) || (isWhiteFigure(fig1) && isWhiteFigure(fig2)); };
+var isFoe = function (fig1, fig2) { return (isBlackFigure(fig1) && isWhiteFigure(fig2)) || (isWhiteFigure(fig1) && isBlackFigure(fig2)); };
+
+var getFigure = function (fen, sq) { return arrayFromFen(fen)[sqNumber(sq)]; };
+
+var getFigures = function (fen, path) { return path.map( function (n) {
+    var obj = {};
+    obj[n] = getFigure(fen, n);
+    return obj
+//}).reduce((el1, el2) => ({...el1, ...el2}), {})
+}).reduce(function (el1, el2) { return Object.assign(el1, el2); }, {}); };
 
 var attacksFromSq = function (fen, sq) {
     var fenArr = arrayFromFen(fen);
@@ -897,6 +944,8 @@ var Chess = function Chess(fen) {
 
 var prototypeAccessors = { title: { configurable: true },version: { configurable: true },turn: { configurable: true },in_fifty_moves_rule: { configurable: true },in_threefold_repetition: { configurable: true },insufficient_material: { configurable: true },in_draw: { configurable: true },isCheck: { configurable: true },isCheckMate: { configurable: true },isStaleMate: { configurable: true },fen: { configurable: true },position: { configurable: true },positions: { configurable: true },game_over: { configurable: true } };
     
+  Chess.utils = function utils () {return utility_funcs};
+    
   Chess.defaultFen = function defaultFen$1 () {return defaultFen};
 
   Chess.sevenTags = function sevenTags () {
@@ -1324,10 +1373,10 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
           const v = require('../package.json').version
           return v ? v : '0.12.3'
       } else {
-          return '0.13.2'
+          return '0.13.3'
       }
     */
-    return '0.13.2'
+    return '0.13.3'
   };
 
   prototypeAccessors.turn.get = function () {
@@ -1453,5 +1502,116 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
 Object.defineProperties( Chess.prototype, prototypeAccessors );
+
+var utility_funcs = {
+    lpad: lpad,
+    rpad: rpad,
+    capitalize: capitalize,
+    groupArray: groupArray,
+    makeSet: makeSet,
+    range: range,
+
+    sanRegExp: sanRegExp,
+    pgnTagLineRegExp: pgnTagLineRegExp,
+
+    defaultFen: defaultFen, 
+    sicilianFen: sicilianFen,
+    scandinavianFen: scandinavianFen,
+    oddFrenchFen: oddFrenchFen,
+    mateLocoFen: mateLocoFen,
+    mateAyudadoFen: mateAyudadoFen,
+    prePastorFen: prePastorFen,
+    pastorFen: pastorFen,
+
+    pgnDate: pgnDate,
+    makeFenComparable: makeFenComparable,
+    fen2obj: fen2obj,
+    obj2fen: obj2fen,
+    expandFen: expandFen,
+    compressFen: compressFen,
+    fen2array: fen2array,
+    defaultFenArray: defaultFenArray,
+    array2fenString: array2fenString,
+    computedFenString: computedFenString,
+    row: row,
+    col: col,
+    sq2rowcol: sq2rowcol,
+    rowcol2sq: rowcol2sq,
+    col2letter: col2letter,
+    letter2col: letter2col,
+    sq2san: sq2san,
+    san2sq: san2sq,
+    isBlackFigure: isBlackFigure,
+    isWhiteFigure: isWhiteFigure,
+    isEmptyFigure: isEmptyFigure,
+    isDarkSquare: isDarkSquare,
+    isLightSquare: isLightSquare,
+    difRow: difRow,
+    difCol: difCol,
+    isSameRow: isSameRow,
+    isSameCol: isSameCol,
+    isDiagonal: isDiagonal,
+    isAntiDiagonal: isAntiDiagonal,
+    isKingReach: isKingReach,
+    path: path,
+    innerPath: innerPath,
+    isForward: isForward,
+    kingSq: kingSq,
+    isClearPath: isClearPath,
+    isPawnMove: isPawnMove,
+    isPawnAttack: isPawnAttack,
+    isCastling: isCastling,
+    isKingMove: isKingMove,
+    isBishopMove: isBishopMove,
+    isRookMove: isRookMove,
+    isQueenMove: isQueenMove,
+    army: army,
+    wBishops: wBishops,
+    wBishopsD: wBishopsD,
+    wBishopsD: wBishopsD,
+    wKings: wKings,
+    wKnights: wKnights,
+    wPawns: wPawns,
+    wQueens: wQueens,
+    wRooks: wRooks,
+    bBishops: bBishops,
+    bBishopsD: bBishopsD,
+    bBishopsL: bBishopsL,
+    bKings: bKings,
+    bKnights: bKnights,
+    bPawns: bPawns,
+    bQueens: bQueens,
+    bRooks: bRooks,
+    wArmy: wArmy,
+    bArmy: bArmy,
+    wAttackers: wAttackers,
+    bAttackers: bAttackers,
+    wAttacks: wAttacks,
+    bAttacks: bAttacks,
+    wPMoves: wPMoves,
+    bPMoves: bPMoves,
+    isFriend: isFriend,
+    isFoe: isFoe,
+    getFigure: getFigure,
+    getFigures: getFigures,
+    attacksFromSq: attacksFromSq,
+    attacksOnSq: attacksOnSq,
+    checksTo: checksTo,
+    isCheck: isCheck,
+    isCheckMate: isCheckMate,
+    isStaleMate: isStaleMate   ,
+    canKingMove: canKingMove,
+    canMove: canMove,
+    candidateMoves: candidateMoves,
+    availableMoves: availableMoves,
+    validateFen: validateFen,
+    tryMove: tryMove,
+    stripSan: stripSan, 
+    args2san: args2san,
+    san2args: san2args,
+    clear: clear,
+    insuficientMaterial: insuficientMaterial,
+    Chess: Chess,
+};
 
 export default Chess;
