@@ -1036,7 +1036,7 @@ class Chess {
         if (turn === 'w') {
             prefix = `${fullMoveNumber}. `
         } else {
-            prefix = all ? `${fullMoveNumber}. ... ` : ''
+            prefix = all ? `${fullMoveNumber}. ` : ''
         }
         const san = this.history()[number - 1]
 
@@ -1071,6 +1071,7 @@ class Chess {
     }
 
     load_pgn(pgn) {
+        if (pgn.length < 5) return false
         const strip_nums = text => text.replace(/\d+\.\s*(\.\.\.)?\s*/g, '')
         const is_san = text => sanRegExp.test(text)
         const is_result = text => !!Chess.results().find(r => r === text)
@@ -1104,7 +1105,7 @@ class Chess {
                  if ('[' === current) {
                      state = 'LABEL'
                  } else if ('{' === current) {
-                     prev_state = state
+                     prevState = state
                      state = 'COMMENT'
                  } else if ('(' === current) {
                     prevState = state
@@ -1322,7 +1323,7 @@ class Chess {
             return '0.12.3'
         }
       */
-      return '0.12.8'
+      return '0.12.9'
     }
 
     get turn() {
@@ -1415,6 +1416,16 @@ class Chess {
 
     static square_color(sq) {
         return isLightSquare(sqNumber(sq)) ? 'light' : 'dark'
+    }
+
+    static load_pgn_file(file_str) {
+        const chunks = file_str.split(/\n\n/)
+        const halves = chunks.length % 2 ? chunks.slice(0, -1) : chunks
+        let retArr = []
+        for (let i = 0; i < halves.length; i += 2) {
+          retArr = [...retArr, [halves[i], halves[i + 1]].join('\n\n')] 
+          }
+        return retArr.map(pgn => {if (pgn.length < 10) return null; let g = new Chess; g.load_pgn(pgn); return g})
     }
 
     fens() { return this.__fens__}

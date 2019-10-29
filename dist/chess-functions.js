@@ -1019,7 +1019,7 @@
         if (turn === 'w') {
             prefix = fullMoveNumber + ". ";
         } else {
-            prefix = all ? (fullMoveNumber + ". ... ") : '';
+            prefix = all ? (fullMoveNumber + ". ") : '';
         }
         var san = this.history()[number - 1];
 
@@ -1068,6 +1068,7 @@
     };
 
     Chess.prototype.load_pgn = function load_pgn (pgn) {
+        if (pgn.length < 5) { return false }
         var strip_nums = function (text) { return text.replace(/\d+\.\s*(\.\.\.)?\s*/g, ''); };
         var is_san = function (text) { return sanRegExp.test(text); };
         var is_result = function (text) { return !!Chess.results().find(function (r) { return r === text; }); };
@@ -1101,7 +1102,7 @@
                  if ('[' === current) {
                      state = 'LABEL';
                  } else if ('{' === current) {
-                     prev_state = state;
+                     prevState = state;
                      state = 'COMMENT';
                  } else if ('(' === current) {
                     prevState = state;
@@ -1332,7 +1333,7 @@
             return '0.12.3'
         }
       */
-      return '0.12.8'
+      return '0.12.9'
     };
 
     prototypeAccessors.turn.get = function () {
@@ -1427,6 +1428,16 @@
 
     Chess.square_color = function square_color (sq) {
         return isLightSquare(sqNumber(sq)) ? 'light' : 'dark'
+    };
+
+    Chess.load_pgn_file = function load_pgn_file (file_str) {
+        var chunks = file_str.split(/\n\n/);
+        var halves = chunks.length % 2 ? chunks.slice(0, -1) : chunks;
+        var retArr = [];
+        for (var i = 0; i < halves.length; i += 2) {
+          retArr = retArr.concat( [[halves[i], halves[i + 1]].join('\n\n')]); 
+          }
+        return retArr.map(function (pgn) {if (pgn.length < 10) { return null; } var g = new Chess; g.load_pgn(pgn); return g})
     };
 
     Chess.prototype.fens = function fens () { return this.__fens__};
