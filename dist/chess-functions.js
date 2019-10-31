@@ -8,13 +8,13 @@
     if ( padChar === void 0 ) padChar = '0';
     if ( num === void 0 ) num = 2;
 
-    return ("" + (padChar.repeat(num - stri.length)) + stri);
+    return ("" + (padChar.repeat(num - stri.toString().length)) + stri);
   };
   var rpad = function (stri, padChar, num) {
     if ( padChar === void 0 ) padChar = '0';
     if ( num === void 0 ) num = 2;
 
-    return ("" + stri + (padChar.repeat(num - stri.length)));
+    return ("" + stri + (padChar.repeat(num - stri.toString().length)));
   };
 
   var capitalize = function (stri) { return ("" + (stri[0].toUpperCase()) + (stri.slice(1))); };
@@ -1376,7 +1376,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.13.4'
+      return '0.13.5'
     };
 
     prototypeAccessors.turn.get = function () {

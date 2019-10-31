@@ -1,7 +1,7 @@
 "use strict";
 
-const lpad = (stri, padChar = '0', num = 2) => `${padChar.repeat(num - stri.length)}${stri}`
-const rpad = (stri, padChar = '0', num = 2) => `${stri}${padChar.repeat(num - stri.length)}`
+const lpad = (stri, padChar = '0', num = 2) => `${padChar.repeat(num - stri.toString().length)}${stri}`
+const rpad = (stri, padChar = '0', num = 2) => `${stri}${padChar.repeat(num - stri.toString().length)}`
 
 const capitalize = stri => `${stri[0].toUpperCase()}${stri.slice(1)}`
 
@@ -1319,7 +1319,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.13.4'
+      return '0.13.5'
     }
 
     get turn() {
