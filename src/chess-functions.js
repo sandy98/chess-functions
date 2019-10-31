@@ -935,8 +935,10 @@ class Chess {
         return this.reset(fen)
     }
     
+    static version() {return new Chess().version }
+
     static utils() {return utility_funcs}
-    
+
     static defaultFen() {return defaultFen}
 
     static sevenTags() {
@@ -1317,15 +1319,7 @@ class Chess {
     }
 
     get version()  {
-      /*
-        if (typeof require !== 'undefined') {
-            const v = require('../package.json').version
-            return v ? v : '0.12.3'
-        } else {
-            return '0.13.3'
-        }
-      */
-      return '0.13.3'
+      return '0.13.4'
     }
 
     get turn() {
@@ -1456,6 +1450,8 @@ const utility_funcs = {
     groupArray,
     makeSet,
     range,
+    partition,
+    chessboard,
 
     sanRegExp,
     pgnTagLineRegExp,

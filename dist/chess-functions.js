@@ -950,8 +950,10 @@
 
   var prototypeAccessors = { title: { configurable: true },version: { configurable: true },turn: { configurable: true },in_fifty_moves_rule: { configurable: true },in_threefold_repetition: { configurable: true },insufficient_material: { configurable: true },in_draw: { configurable: true },isCheck: { configurable: true },isCheckMate: { configurable: true },isStaleMate: { configurable: true },fen: { configurable: true },position: { configurable: true },positions: { configurable: true },game_over: { configurable: true } };
       
+    Chess.version = function version () {return new Chess().version };
+
     Chess.utils = function utils () {return utility_funcs};
-      
+
     Chess.defaultFen = function defaultFen$1 () {return defaultFen};
 
     Chess.sevenTags = function sevenTags () {
@@ -1374,15 +1376,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      /*
-        if (typeof require !== 'undefined') {
-            const v = require('../package.json').version
-            return v ? v : '0.12.3'
-        } else {
-            return '0.13.3'
-        }
-      */
-      return '0.13.3'
+      return '0.13.4'
     };
 
     prototypeAccessors.turn.get = function () {
@@ -1516,6 +1510,8 @@
       groupArray: groupArray,
       makeSet: makeSet,
       range: range,
+      partition: partition,
+      chessboard: chessboard,
 
       sanRegExp: sanRegExp,
       pgnTagLineRegExp: pgnTagLineRegExp,
