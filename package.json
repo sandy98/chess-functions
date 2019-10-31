@@ -1,6 +1,6 @@
 {
   "name": "chess-functions",
-  "version": "0.13.5",
+  "version": "0.13.6",
   "description": "A brand new chess moves validator/generator",
   "author": "Domingo E. Savoretti <esavoretti@gmail.com>",
   "repository": "https://github.com/sandy98/chess-functions",

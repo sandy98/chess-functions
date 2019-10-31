@@ -2,13 +2,13 @@ var lpad = function (stri, padChar, num) {
   if ( padChar === void 0 ) padChar = '0';
   if ( num === void 0 ) num = 2;
 
-  return ("" + (padChar.repeat(num - stri.toString().length)) + stri);
+  return ("" + (padChar.repeat(stri.toString().length >= num ? 0 : num - stri.toString().length)) + stri);
 };
 var rpad = function (stri, padChar, num) {
   if ( padChar === void 0 ) padChar = '0';
   if ( num === void 0 ) num = 2;
 
-  return ("" + stri + (padChar.repeat(num - stri.toString().length)));
+  return ("" + stri + (padChar.repeat(stri.toString().length >= num ? 0 : num - stri.toString().length)));
 };
 
 var capitalize = function (stri) { return ("" + (stri[0].toUpperCase()) + (stri.slice(1))); };
@@ -1370,7 +1370,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.13.5'
+    return '0.13.6'
   };
 
   prototypeAccessors.turn.get = function () {
