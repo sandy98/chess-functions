@@ -1370,7 +1370,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.13.7'
+    return '0.13.8'
   };
 
   prototypeAccessors.turn.get = function () {
@@ -1537,6 +1537,7 @@ var utility_funcs = {
     letter2col: letter2col,
     sq2san: sq2san,
     san2sq: san2sq,
+    sqNumber: sqNumber,
     isBlackFigure: isBlackFigure,
     isWhiteFigure: isWhiteFigure,
     isEmptyFigure: isEmptyFigure,

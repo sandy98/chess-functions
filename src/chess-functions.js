@@ -1319,7 +1319,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.13.7'
+      return '0.13.8'
     }
 
     get turn() {
@@ -1483,6 +1483,7 @@ const utility_funcs = {
     letter2col,
     sq2san,
     san2sq,
+    sqNumber,
     isBlackFigure,
     isWhiteFigure,
     isEmptyFigure,
