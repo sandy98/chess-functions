@@ -1319,7 +1319,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.13.6'
+      return '0.13.7'
     }
 
     get turn() {

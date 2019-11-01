@@ -1376,7 +1376,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.13.6'
+      return '0.13.7'
     };
 
     prototypeAccessors.turn.get = function () {

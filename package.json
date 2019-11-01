@@ -1,13 +1,13 @@
 {
   "name": "chess-functions",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "description": "A brand new chess moves validator/generator",
   "author": "Domingo E. Savoretti <esavoretti@gmail.com>",
   "repository": "https://github.com/sandy98/chess-functions",
   "homepage": "https://github.com/sandy98/chess-functions#readme",
-  "main": "./dist/chess-rules.min.js",
-  "browser": "./dist/chess-rules.min.js",
-  "esm": "./dist/chess-rules.esm.js",
+  "main": "dist/chess-rules.min.js",
+  "browser": "dist/chess-rules.min.js",
+  "esm": "dist/chess-rules.esm.js",
   "filename": "dist/chess-rules.min.js",
   "files": [
     "dist/"
