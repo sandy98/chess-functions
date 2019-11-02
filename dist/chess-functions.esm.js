@@ -1370,7 +1370,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.13.8'
+    return '0.13.9'
   };
 
   prototypeAccessors.turn.get = function () {

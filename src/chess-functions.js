@@ -289,6 +289,20 @@ const isPawnAttack = (sqFrom, sqTo, colour = 'w') => {
     return true
 }
 
+const isPawnPromotion = (sqFrom, sqTo, colour = 'w') => {
+
+    if (!isPawnAttack(sqFrom, sqTo, colour) && !isPawnMove(sqFrom, sqTo, colour)) {
+        return false
+    }
+    
+    colour = colour.toLowerCase()
+
+    if (colour === 'w' && row(sqTo) === 7) return true
+    if (colour === 'b' && row(sqTo) === 0) return true
+
+    return false
+}
+
 const isCastling = (sqFrom, sqTo, colour = 'w') => {
     colour = colour.toLowerCase()
     if (!/[wb]/.test(colour)) {
@@ -1319,7 +1333,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.13.8'
+      return '0.13.9'
     }
 
     get turn() {
