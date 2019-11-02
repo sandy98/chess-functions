@@ -296,6 +296,22 @@ var isPawnAttack = function (sqFrom, sqTo, colour) {
     return true
 };
 
+var isPawnPromotion = function (sqFrom, sqTo, colour) {
+    if ( colour === void 0 ) colour = 'w';
+
+
+    if (!isPawnAttack(sqFrom, sqTo, colour) && !isPawnMove(sqFrom, sqTo, colour)) {
+        return false
+    }
+    
+    colour = colour.toLowerCase();
+
+    if (colour === 'w' && row(sqTo) === 7) { return true }
+    if (colour === 'b' && row(sqTo) === 0) { return true }
+
+    return false
+};
+
 var isCastling = function (sqFrom, sqTo, colour) {
     if ( colour === void 0 ) colour = 'w';
 
@@ -1557,6 +1573,7 @@ var utility_funcs = {
     isClearPath: isClearPath,
     isPawnMove: isPawnMove,
     isPawnAttack: isPawnAttack,
+    isPawnPromotion: isPawnPromotion,
     isCastling: isCastling,
     isKingMove: isKingMove,
     isBishopMove: isBishopMove,

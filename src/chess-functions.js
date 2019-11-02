@@ -1517,6 +1517,7 @@ const utility_funcs = {
     isClearPath,
     isPawnMove,
     isPawnAttack,
+    isPawnPromotion,
     isCastling,
     isKingMove,
     isBishopMove,
