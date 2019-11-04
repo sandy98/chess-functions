@@ -860,7 +860,7 @@ const args2san = (fen, sqFrom, sqTo, promotion) => {
         figure =  isSameCol(sqFrom, sqTo) ?  '' : col2letter(col(sqFrom))
         extrainfo = ''
         if ((row(sqTo) === 7 && figFrom === 'P') || 
-           (row(sqTo) === 7 && figFrom === 'P')) {
+           (row(sqTo) === 0 && figFrom === 'p')) {
             promotionFigure = `=${promotion ? promotion.toUpperCase() : 'Q'}`
         } else {
             promotionFigure = ''
@@ -1333,7 +1333,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.13.9'
+      return '0.14.1'
     }
 
     get turn() {

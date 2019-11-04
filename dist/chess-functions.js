@@ -863,7 +863,7 @@
           figure =  isSameCol(sqFrom, sqTo) ?  '' : col2letter(col(sqFrom));
           extrainfo = '';
           if ((row(sqTo) === 7 && figFrom === 'P') || 
-             (row(sqTo) === 7 && figFrom === 'P')) {
+             (row(sqTo) === 0 && figFrom === 'p')) {
               promotionFigure = "=" + (promotion ? promotion.toUpperCase() : 'Q');
           } else {
               promotionFigure = '';
@@ -1392,7 +1392,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.13.9'
+      return '0.14.1'
     };
 
     prototypeAccessors.turn.get = function () {

@@ -857,7 +857,7 @@ var args2san = function (fen, sqFrom, sqTo, promotion) {
         figure =  isSameCol(sqFrom, sqTo) ?  '' : col2letter(col(sqFrom));
         extrainfo = '';
         if ((row(sqTo) === 7 && figFrom === 'P') || 
-           (row(sqTo) === 7 && figFrom === 'P')) {
+           (row(sqTo) === 0 && figFrom === 'p')) {
             promotionFigure = "=" + (promotion ? promotion.toUpperCase() : 'Q');
         } else {
             promotionFigure = '';
@@ -1386,7 +1386,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.13.9'
+    return '0.14.1'
   };
 
   prototypeAccessors.turn.get = function () {
