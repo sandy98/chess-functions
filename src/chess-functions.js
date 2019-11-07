@@ -1335,11 +1335,17 @@ class Chess {
     }
 
     get version()  {
-      return '0.14.6'
+      return '0.14.7'
     }
 
     get turn() {
+        if (!this.fen) return ''
         return fen2obj(this.fen).turn
+    }
+
+    get castling() {
+        if (!this.fen) return ''
+        return fen2obj(this.fen).castling
     }
 
     get in_fifty_moves_rule() {

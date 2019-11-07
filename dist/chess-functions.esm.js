@@ -960,7 +960,7 @@ var Chess = function Chess(fen) {
       return this.reset(fen)
   };
 
-var prototypeAccessors = { title: { configurable: true },version: { configurable: true },turn: { configurable: true },in_fifty_moves_rule: { configurable: true },in_threefold_repetition: { configurable: true },insufficient_material: { configurable: true },in_draw: { configurable: true },isCheck: { configurable: true },isCheckMate: { configurable: true },isStaleMate: { configurable: true },fen: { configurable: true },position: { configurable: true },positions: { configurable: true },game_over: { configurable: true } };
+var prototypeAccessors = { title: { configurable: true },version: { configurable: true },turn: { configurable: true },castling: { configurable: true },in_fifty_moves_rule: { configurable: true },in_threefold_repetition: { configurable: true },insufficient_material: { configurable: true },in_draw: { configurable: true },isCheck: { configurable: true },isCheckMate: { configurable: true },isStaleMate: { configurable: true },fen: { configurable: true },position: { configurable: true },positions: { configurable: true },game_over: { configurable: true } };
     
   Chess.version = function version () {return new Chess().version };
 
@@ -1388,11 +1388,17 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.14.6'
+    return '0.14.7'
   };
 
   prototypeAccessors.turn.get = function () {
+      if (!this.fen) { return '' }
       return fen2obj(this.fen).turn
+  };
+
+  prototypeAccessors.castling.get = function () {
+      if (!this.fen) { return '' }
+      return fen2obj(this.fen).castling
   };
 
   prototypeAccessors.in_fifty_moves_rule.get = function () {
