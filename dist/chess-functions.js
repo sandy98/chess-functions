@@ -69,6 +69,7 @@
   var pgnTagLineRegExp = /^\s*\[\s*(.+?)\s+"(.+?)"\s*\]\s*$/;
 
   var defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  var emptyFen = '8/8/8/8/8/8/8/8 w - - 0 1';
   var sicilianFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 1';
   var scandinavianFen = 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2';
   var oddFrenchFen = 'rnbqkbnr/ppp2ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3';
@@ -1392,7 +1393,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.14.3'
+      return '0.14.5'
     };
 
     prototypeAccessors.turn.get = function () {
@@ -1437,7 +1438,7 @@
     prototypeAccessors.fen.set = function (newFen) {
           if ( newFen === void 0 ) newFen =Chess.defaultFen();
 
-        this.load(newFen);
+        this.__fens__[this.__fens__.length -1] = newFen;
     };
 
     prototypeAccessors.position.get = function () {
@@ -1533,6 +1534,7 @@
       pgnTagLineRegExp: pgnTagLineRegExp,
 
       defaultFen: defaultFen, 
+      emptyFen: emptyFen,
       sicilianFen: sicilianFen,
       scandinavianFen: scandinavianFen,
       oddFrenchFen: oddFrenchFen,

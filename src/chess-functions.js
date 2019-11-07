@@ -52,6 +52,7 @@ const sanRegExp = /(?:(^0-0-0|^O-O-O)|(^0-0|^O-O)|(?:^([a-h])(?:([1-8])|(?:x([a-
 const pgnTagLineRegExp = /^\s*\[\s*(.+?)\s+"(.+?)"\s*\]\s*$/
 
 const defaultFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+const emptyFen = '8/8/8/8/8/8/8/8 w - - 0 1'
 const sicilianFen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 1'
 const scandinavianFen = 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2'
 const oddFrenchFen = 'rnbqkbnr/ppp2ppp/4p3/3pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3'
@@ -1333,7 +1334,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.14.3'
+      return '0.14.5'
     }
 
     get turn() {
@@ -1376,7 +1377,7 @@ class Chess {
     }
 
     set fen(newFen =  Chess.defaultFen()) {
-        this.load(newFen)
+        this.__fens__[this.__fens__.length -1] = newFen
     }
 
     get position() {
@@ -1471,6 +1472,7 @@ const utility_funcs = {
     pgnTagLineRegExp,
 
     defaultFen, 
+    emptyFen,
     sicilianFen,
     scandinavianFen,
     oddFrenchFen,
