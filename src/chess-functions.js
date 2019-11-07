@@ -1056,7 +1056,7 @@ class Chess {
         if (turn === 'w') {
             prefix = `${fullMoveNumber}. `
         } else {
-            prefix = all ? `${fullMoveNumber}. ` : ''
+            prefix = all ? `${fullMoveNumber}. ... ` : ''
         }
         const san = this.history()[number - 1]
 
@@ -1064,7 +1064,13 @@ class Chess {
     }
 
     numbered_history(all = false) {
-        return this.history().map((_, i) => this.san_with_number(i + 1, all))
+        if (this.getTurn(0) === 'w') {
+            //console.log('Returning history started with white')
+            return this.history().map((_, i) => this.san_with_number(i + 1, all))
+        } else {
+            //console.log('Returning history started with black')
+            return [this.san_with_number(1, true)].concat(this.history().slice(1).map((_, i) => this.san_with_number(i + 2, all)))
+        }
     } 
 
     pgn_moves(sep = '\n', line_break = 16){
@@ -1335,18 +1341,41 @@ class Chess {
     }
 
     get version()  {
-      return '0.14.7'
+      return '0.14.9'
     }
 
-    get turn() {
-        if (!this.fen) return ''
-        return fen2obj(this.fen).turn
+    __getField(fieldName = 'turn', n = this.history().length) {
+        const fields = ['turn', 'castling', 'enPassant', 'fullMoveNumber', 'halfMoveClock']
+        if (!fields.find(f => f === fieldName)) return null
+        if (n < 0) n = 0
+        if (n > this.history().length) n = this.history.length
+        return fen2obj(this.fens()[n])[fieldName]
     }
 
-    get castling() {
-        if (!this.fen) return ''
-        return fen2obj(this.fen).castling
+    getTurn(n = this.history().length) {
+         return this.__getField('turn', n)
     }
+    get turn() {return this.getTurn()}
+
+    getCastling(n = this.history().length) {
+         return this.__getField('castling', n)
+    }
+    get castling() {return this.getCastling()}
+    
+    getEnPassant(n = this.history().length) {
+        return this.__getField('enPassant', n)
+   }
+   get enPassant() {return this.getEnPassant()}
+
+   getHalfMoveClock(n = this.history().length) {
+    return this.__getField('halfMoveClock', n)
+   }
+   get halfMoveClock() {return this.getHalfMoveClock()}
+
+    getFullMoveNumber(n = this.history().length) {
+         return this.__getField('fullMoveNumber', n)
+    }
+    get fullMoveNumber() {return this.getFullMoveNumber()}
 
     get in_fifty_moves_rule() {
         return parseInt(fen2obj(this.fen).halfMoveClock) >= 100

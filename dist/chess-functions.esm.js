@@ -960,7 +960,7 @@ var Chess = function Chess(fen) {
       return this.reset(fen)
   };
 
-var prototypeAccessors = { title: { configurable: true },version: { configurable: true },turn: { configurable: true },castling: { configurable: true },in_fifty_moves_rule: { configurable: true },in_threefold_repetition: { configurable: true },insufficient_material: { configurable: true },in_draw: { configurable: true },isCheck: { configurable: true },isCheckMate: { configurable: true },isStaleMate: { configurable: true },fen: { configurable: true },position: { configurable: true },positions: { configurable: true },game_over: { configurable: true } };
+var prototypeAccessors = { title: { configurable: true },version: { configurable: true },turn: { configurable: true },castling: { configurable: true },enPassant: { configurable: true },halfMoveClock: { configurable: true },fullMoveNumber: { configurable: true },in_fifty_moves_rule: { configurable: true },in_threefold_repetition: { configurable: true },insufficient_material: { configurable: true },in_draw: { configurable: true },isCheck: { configurable: true },isCheckMate: { configurable: true },isStaleMate: { configurable: true },fen: { configurable: true },position: { configurable: true },positions: { configurable: true },game_over: { configurable: true } };
     
   Chess.version = function version () {return new Chess().version };
 
@@ -1082,7 +1082,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
       if (turn === 'w') {
           prefix = fullMoveNumber + ". ";
       } else {
-          prefix = all ? (fullMoveNumber + ". ") : '';
+          prefix = all ? (fullMoveNumber + ". ... ") : '';
       }
       var san = this.history()[number - 1];
 
@@ -1093,7 +1093,13 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
         var this$1 = this;
         if ( all === void 0 ) all = false;
 
-      return this.history().map(function (_, i) { return this$1.san_with_number(i + 1, all); })
+      if (this.getTurn(0) === 'w') {
+          //console.log('Returning history started with white')
+          return this.history().map(function (_, i) { return this$1.san_with_number(i + 1, all); })
+      } else {
+          //console.log('Returning history started with black')
+          return [this.san_with_number(1, true)].concat(this.history().slice(1).map(function (_, i) { return this$1.san_with_number(i + 2, all); }))
+      }
   }; 
 
   Chess.prototype.pgn_moves = function pgn_moves (sep, line_break){
@@ -1388,18 +1394,54 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.14.7'
+    return '0.14.9'
   };
 
-  prototypeAccessors.turn.get = function () {
-      if (!this.fen) { return '' }
-      return fen2obj(this.fen).turn
+  Chess.prototype.__getField = function __getField (fieldName, n) {
+        if ( fieldName === void 0 ) fieldName = 'turn';
+        if ( n === void 0 ) n = this.history().length;
+
+      var fields = ['turn', 'castling', 'enPassant', 'fullMoveNumber', 'halfMoveClock'];
+      if (!fields.find(function (f) { return f === fieldName; })) { return null }
+      if (n < 0) { n = 0; }
+      if (n > this.history().length) { n = this.history.length; }
+      return fen2obj(this.fens()[n])[fieldName]
   };
 
-  prototypeAccessors.castling.get = function () {
-      if (!this.fen) { return '' }
-      return fen2obj(this.fen).castling
+  Chess.prototype.getTurn = function getTurn (n) {
+         if ( n === void 0 ) n = this.history().length;
+
+       return this.__getField('turn', n)
   };
+  prototypeAccessors.turn.get = function () {return this.getTurn()};
+
+  Chess.prototype.getCastling = function getCastling (n) {
+         if ( n === void 0 ) n = this.history().length;
+
+       return this.__getField('castling', n)
+  };
+  prototypeAccessors.castling.get = function () {return this.getCastling()};
+    
+  Chess.prototype.getEnPassant = function getEnPassant (n) {
+        if ( n === void 0 ) n = this.history().length;
+
+      return this.__getField('enPassant', n)
+ };
+ prototypeAccessors.enPassant.get = function () {return this.getEnPassant()};
+
+ Chess.prototype.getHalfMoveClock = function getHalfMoveClock (n) {
+    if ( n === void 0 ) n = this.history().length;
+
+  return this.__getField('halfMoveClock', n)
+ };
+ prototypeAccessors.halfMoveClock.get = function () {return this.getHalfMoveClock()};
+
+  Chess.prototype.getFullMoveNumber = function getFullMoveNumber (n) {
+         if ( n === void 0 ) n = this.history().length;
+
+       return this.__getField('fullMoveNumber', n)
+  };
+  prototypeAccessors.fullMoveNumber.get = function () {return this.getFullMoveNumber()};
 
   prototypeAccessors.in_fifty_moves_rule.get = function () {
       return parseInt(fen2obj(this.fen).halfMoveClock) >= 100
