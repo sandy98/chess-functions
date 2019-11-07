@@ -86,7 +86,7 @@ var fen2obj = function (fen) {
 
 var obj2fen = function (fenObj) {
     delete fenObj.fenArray;
-    return values(fenObj).join(' ')
+    return ((fenObj.fenString) + " " + (fenObj.turn) + " " + (fenObj.castling) + " " + (fenObj.enPassant) + " " + (fenObj.halfMoveClock) + " " + (fenObj.fullMoveNumber))
 };
 
 var expandFen = function (fen) { return fen.replace(/\//g, '').replace(/[1-8]/g, function (d) { return ('0').repeat(parseInt(d)); }); };
@@ -1386,7 +1386,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.14.1'
+    return '0.14.3'
   };
 
   prototypeAccessors.turn.get = function () {

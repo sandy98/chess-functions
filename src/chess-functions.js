@@ -83,7 +83,7 @@ const fen2obj = fen => {
 
 const obj2fen = fenObj => {
     delete fenObj.fenArray
-    return values(fenObj).join(' ')
+    return `${fenObj.fenString} ${fenObj.turn} ${fenObj.castling} ${fenObj.enPassant} ${fenObj.halfMoveClock} ${fenObj.fullMoveNumber}`
 }
 
 const expandFen = fen => fen.replace(/\//g, '').replace(/[1-8]/g, d => ('0').repeat(parseInt(d)))
@@ -1333,7 +1333,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.14.1'
+      return '0.14.3'
     }
 
     get turn() {
