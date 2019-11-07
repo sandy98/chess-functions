@@ -637,6 +637,7 @@ const availableMoves = fen => {
 }
 
 const validateFen = fen => {
+    if (!fen) return {valid: false, code: 4, message: 'Unknown error'}
     const {fenArray, turn} = fen2obj(fen)
     if (fenArray.filter(fig => fig === 'k').length !== 1) {
         return {valid: false, code: 2, message: 'There must be one and only one black king'}
@@ -1334,7 +1335,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.14.5'
+      return '0.14.6'
     }
 
     get turn() {

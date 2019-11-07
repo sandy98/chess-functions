@@ -615,6 +615,7 @@ var availableMoves = function (fen) {
 };
 
 var validateFen = function (fen) {
+    if (!fen) { return {valid: false, code: 4, message: 'Unknown error'} }
     var ref = fen2obj(fen);
     var fenArray = ref.fenArray;
     var turn = ref.turn;
@@ -1387,7 +1388,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.14.5'
+    return '0.14.6'
   };
 
   prototypeAccessors.turn.get = function () {
