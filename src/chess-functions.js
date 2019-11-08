@@ -1,5 +1,7 @@
 "use strict";
 
+const DEBUG = false
+
 const lpad = (stri, padChar = '0', num = 2) => `${padChar.repeat(stri.toString().length >= num ? 0 : num - stri.toString().length)}${stri}`
 const rpad = (stri, padChar = '0', num = 2) => `${stri}${padChar.repeat(stri.toString().length >= num ? 0 : num - stri.toString().length)}`
 
@@ -1011,6 +1013,7 @@ class Chess {
         this.__sans__ = ['']
         this.headers('Result', Chess.getResultString(this), 'FEN', fen, 'SetUp', '1')
         delete this.__headers__.PlyCount
+        DEBUG && console.log('Turno' + this.turn)
         return this
     }
 
@@ -1041,7 +1044,7 @@ class Chess {
 
     console_view(fennum, flipped = false) {
         fennum = fennum || this.fens().length - 1
-        console.log(this.ascii(fennum, flipped))
+        DEBUG && console.log(this.ascii(fennum, flipped))
     }
 
     clear() {
@@ -1129,6 +1132,7 @@ class Chess {
             switch (state) {
                case states[0]: //'SCANNING' 
                  if ('[' === current) {
+                     DEBUG && console.log('Paso a "LABEL"')
                      state = 'LABEL'
                  } else if ('{' === current) {
                      prevState = state
@@ -1137,30 +1141,43 @@ class Chess {
                     prevState = state
                     state = 'VARIANT'
                  } else if (current.match(/[\s\]]/)) {
+                    DEBUG && console.log('Match de espacio o ]. Sigue en estado "SCANNING"') 
                     continue
                  } else {
                      prevState = state
                      state = 'TOKEN'
                      token = current
+                     DEBUG && console.log('Paso a "TOKEN"')
                  }
                  continue
                case states[1]: //'LABEL' 
                  if ('"' === current) {
+                     DEBUG && console.log('Pasando a "VALUE"')
                      state = 'VALUE'
                  } else {
                     label += current
+                    DEBUG && console.log("Label actual: " + label)
                  }
                  continue
                case states[2]: //'VALUE' 
                  if (/[\"\]]/.test(current)) {
+                    DEBUG && console.log("Estableciondo header: " + label + " con valor: " + value) 
                     game.headers(capitalize(label.trim()), value)
-                    if (label.toLowerCase() === 'fen') {
-                        if (!game.load(value)) return false
+                    if (label.trim().toLowerCase() === 'fen') {
+                        DEBUG && console.log("Estableciendo FEN inicial")
+                        if (!game.load(value)) {
+                            DEBUG && console.log("No se pudo cargar el FEN: " + value)
+                            return false
+                        } else {
+                            DEBUG && console.log("Se cargó el FEN: " + value)
+                        }
                         game.headers('SetUp', '1')
                     }
-                    if (label.toLowerCase() === 'result') {
+                    if (label.trim().toLowerCase() === 'result') {
+                        DEBUG && console.log("Cargando resultado: " + value)
                         header_result = value
                     }
+                    DEBUG && console.log("Limpiando label y value")
                     label = ''
                     value = ''
                     state = 'SCANNING'
@@ -1177,6 +1194,7 @@ class Chess {
                      state = 'VARIANT'
                  } else if (current.match(/[\s\[]/)) {
                      if (is_result(token)) {
+                         DEBUG && console.log("Cargando token resultado: " + token)
                          game.headers('Result', token)
                      }
                      if (is_result(token) || current === '[') {
@@ -1193,7 +1211,7 @@ class Chess {
                      if (is_san(token)) {
                          const result = game.move(token)
                          if (!result) {
-                             console.log(`${token} move failed to load.`)
+                             DEBUG && console.log(`${token} move failed to load.`)
                              return false
                          }
                          token = ''
@@ -1202,6 +1220,7 @@ class Chess {
                      }
                  } else {
                      token += current
+                     DEBUG && console.log("Creando token: " + token)
                  }
                  continue
                case states[4]: //'COMMENT' 
@@ -1341,7 +1360,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.14.9'
+      return '0.15.0'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {

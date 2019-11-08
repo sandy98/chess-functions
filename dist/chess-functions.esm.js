@@ -1060,10 +1060,8 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   Chess.prototype.console_view = function console_view (fennum, flipped) {
-        if ( flipped === void 0 ) flipped = false;
 
       fennum = fennum || this.fens().length - 1;
-      console.log(this.ascii(fennum, flipped));
   };
 
   Chess.prototype.clear = function clear$1 () {
@@ -1194,11 +1192,13 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
              case states[2]: //'VALUE' 
                if (/[\"\]]/.test(current)) {
                   game.headers(capitalize(label.trim()), value);
-                  if (label.toLowerCase() === 'fen') {
-                      if (!game.load(value)) { return false }
+                  if (label.trim().toLowerCase() === 'fen') {
+                      if (!game.load(value)) {
+                          return false
+                      }
                       game.headers('SetUp', '1');
                   }
-                  if (label.toLowerCase() === 'result') {
+                  if (label.trim().toLowerCase() === 'result') {
                       header_result = value;
                   }
                   label = '';
@@ -1233,7 +1233,6 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
                    if (is_san(token)) {
                        var result = game.move(token);
                        if (!result) {
-                           console.log((token + " move failed to load."));
                            return false
                        }
                        token = '';
@@ -1394,7 +1393,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.14.9'
+    return '0.15.0'
   };
 
   Chess.prototype.__getField = function __getField (fieldName, n) {
