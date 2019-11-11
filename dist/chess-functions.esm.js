@@ -1134,7 +1134,9 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
       return ("" + (this.pgn_headers(sep)) + (this.pgn_moves(sep, line_break)))
   };
 
-  Chess.prototype.load_pgn = function load_pgn (pgn) {
+  Chess.prototype.load_pgn = function load_pgn (pgn, headers_only) {
+        if ( headers_only === void 0 ) headers_only = false;
+
       if (pgn.length < 5) { return false }
       var strip_nums = function (text) { return text.replace(/\d+\.\s*(\.\.\.)?\s*/g, ''); };
       var is_san = function (text) { return sanRegExp.test(text); };
@@ -1177,6 +1179,12 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
                } else if (current.match(/[\s\]]/)) {
                   continue
                } else {
+                   if (headers_only) {
+                      this.__headers__ = game.__headers__;
+                      this.__fens__ = [game.__fens__[0]];
+                      this.__sans__ = [''];
+                      return true
+                   }
                    prevState = state;
                    state = 'TOKEN';
                    token = current;
@@ -1393,7 +1401,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.15.0'
+    return '0.15.2'
   };
 
   Chess.prototype.__getField = function __getField (fieldName, n) {
@@ -1536,14 +1544,16 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
       return isLightSquare(sqNumber(sq)) ? 'light' : 'dark'
   };
 
-  Chess.load_pgn_file = function load_pgn_file (file_str) {
+  Chess.load_pgn_file = function load_pgn_file (file_str, headers_only) {
+        if ( headers_only === void 0 ) headers_only = false;
+
       var chunks = file_str.split(/\n\n/);
       var halves = chunks.length % 2 ? chunks.slice(0, -1) : chunks;
       var retArr = [];
       for (var i = 0; i < halves.length; i += 2) {
         retArr = retArr.concat( [[halves[i], halves[i + 1]].join('\n\n')]); 
         }
-      return retArr.map(function (pgn) {if (pgn.length < 10) { return null; } var g = new Chess; g.load_pgn(pgn); return g})
+      return retArr.map(function (pgn) {if (pgn.length < 10) { return null; } var g = new Chess; g.load_pgn(pgn, headers_only); return g})
   };
 
   Chess.prototype.fens = function fens () { return this.__fens__};

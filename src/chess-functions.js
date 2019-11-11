@@ -1099,7 +1099,7 @@ class Chess {
         return `${this.pgn_headers(sep)}${this.pgn_moves(sep, line_break)}`
     }
 
-    load_pgn(pgn) {
+    load_pgn(pgn, headers_only = false) {
         if (pgn.length < 5) return false
         const strip_nums = text => text.replace(/\d+\.\s*(\.\.\.)?\s*/g, '')
         const is_san = text => sanRegExp.test(text)
@@ -1144,6 +1144,12 @@ class Chess {
                     DEBUG && console.log('Match de espacio o ]. Sigue en estado "SCANNING"') 
                     continue
                  } else {
+                     if (headers_only) {
+                        this.__headers__ = game.__headers__
+                        this.__fens__ = [game.__fens__[0]]
+                        this.__sans__ = ['']
+                        return true
+                     }
                      prevState = state
                      state = 'TOKEN'
                      token = current
@@ -1360,7 +1366,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.15.0'
+      return '0.15.2'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {
@@ -1488,14 +1494,14 @@ class Chess {
         return isLightSquare(sqNumber(sq)) ? 'light' : 'dark'
     }
 
-    static load_pgn_file(file_str) {
+    static load_pgn_file(file_str, headers_only = false) {
         const chunks = file_str.split(/\n\n/)
         const halves = chunks.length % 2 ? chunks.slice(0, -1) : chunks
         let retArr = []
         for (let i = 0; i < halves.length; i += 2) {
           retArr = [...retArr, [halves[i], halves[i + 1]].join('\n\n')] 
           }
-        return retArr.map(pgn => {if (pgn.length < 10) return null; let g = new Chess; g.load_pgn(pgn); return g})
+        return retArr.map(pgn => {if (pgn.length < 10) return null; let g = new Chess; g.load_pgn(pgn, headers_only); return g})
     }
 
     fens() { return this.__fens__}
