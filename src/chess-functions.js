@@ -1366,7 +1366,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.15.2'
+      return '0.15.8'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {
@@ -1495,7 +1495,7 @@ class Chess {
     }
 
     static load_pgn_file(file_str, headers_only = false) {
-        const chunks = file_str.split(/\n\n/)
+        const chunks = file_str.replace(/\r/g, '\n').split(/\n{2,}/g)
         const halves = chunks.length % 2 ? chunks.slice(0, -1) : chunks
         let retArr = []
         for (let i = 0; i < halves.length; i += 2) {

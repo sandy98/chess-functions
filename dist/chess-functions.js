@@ -1407,7 +1407,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.15.2'
+      return '0.15.8'
     };
 
     Chess.prototype.__getField = function __getField (fieldName, n) {
@@ -1553,7 +1553,7 @@
     Chess.load_pgn_file = function load_pgn_file (file_str, headers_only) {
           if ( headers_only === void 0 ) headers_only = false;
 
-        var chunks = file_str.split(/\n\n/);
+        var chunks = file_str.replace(/\r/g, '\n').split(/\n{2,}/g);
         var halves = chunks.length % 2 ? chunks.slice(0, -1) : chunks;
         var retArr = [];
         for (var i = 0; i < halves.length; i += 2) {
