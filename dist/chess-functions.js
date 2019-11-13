@@ -4,8 +4,6 @@
   (global = global || self, global.Chess = factory());
 }(this, (function () { 'use strict';
 
-  var DEBUG = process && process.env && process.env.DEBUG;
-
   var lpad = function (stri, padChar, num) {
     if ( padChar === void 0 ) padChar = '0';
     if ( num === void 0 ) num = 2;
@@ -1032,7 +1030,6 @@
         this.__sans__ = [''];
         this.headers('Result', Chess.getResultString(this), 'FEN', fen, 'SetUp', '1');
         delete this.__headers__.PlyCount;
-        DEBUG && console.log('Turno' + this.turn);
         return this
     };
 
@@ -1069,10 +1066,8 @@
     };
 
     Chess.prototype.console_view = function console_view (fennum, flipped) {
-          if ( flipped === void 0 ) flipped = false;
 
         fennum = fennum || this.fens().length - 1;
-        DEBUG && console.log(this.ascii(fennum, flipped));
     };
 
     Chess.prototype.clear = function clear$1 () {
@@ -1180,7 +1175,6 @@
             switch (state) {
                case states[0]: //'SCANNING' 
                  if ('[' === current) {
-                     DEBUG && console.log('Paso a "LABEL"');
                      state = 'LABEL';
                  } else if ('{' === current) {
                      prevState = state;
@@ -1189,7 +1183,6 @@
                     prevState = state;
                     state = 'VARIANT';
                  } else if (current.match(/[\s\]]/)) {
-                    DEBUG && console.log('Match de espacio o ]. Sigue en estado "SCANNING"'); 
                     continue
                  } else {
                      if (headers_only) {
@@ -1201,37 +1194,27 @@
                      prevState = state;
                      state = 'TOKEN';
                      token = current;
-                     DEBUG && console.log('Paso a "TOKEN"');
                  }
                  continue
                case states[1]: //'LABEL' 
                  if ('"' === current) {
-                     DEBUG && console.log('Pasando a "VALUE"');
                      state = 'VALUE';
                  } else {
                     label += current;
-                    DEBUG && console.log("Label actual: " + label);
                  }
                  continue
                case states[2]: //'VALUE' 
                  if (/[\"\]]/.test(current)) {
-                    DEBUG && console.log("Estableciondo header: " + label + " con valor: " + value); 
                     game.headers(capitalize(label.trim()), value);
                     if (label.trim().toLowerCase() === 'fen') {
-                        DEBUG && console.log("Estableciendo FEN inicial");
                         if (!game.load(value)) {
-                            DEBUG && console.log("No se pudo cargar el FEN: " + value);
                             return false
-                        } else {
-                            DEBUG && console.log("Se cargó el FEN: " + value);
                         }
                         game.headers('SetUp', '1');
                     }
                     if (label.trim().toLowerCase() === 'result') {
-                        DEBUG && console.log("Cargando resultado: " + value);
                         header_result = value;
                     }
-                    DEBUG && console.log("Limpiando label y value");
                     label = '';
                     value = '';
                     state = 'SCANNING';
@@ -1248,7 +1231,6 @@
                      state = 'VARIANT';
                  } else if (current.match(/[\s\[]/)) {
                      if (is_result(token)) {
-                         DEBUG && console.log("Cargando token resultado: " + token);
                          game.headers('Result', token);
                      }
                      if (is_result(token) || current === '[') {
@@ -1265,7 +1247,6 @@
                      if (is_san(token)) {
                          var result = game.move(token);
                          if (!result) {
-                             DEBUG && console.log((token + " move failed to load."));
                              return false
                          }
                          token = '';
@@ -1274,7 +1255,6 @@
                      }
                  } else {
                      token += current;
-                     DEBUG && console.log("Creando token: " + token);
                  }
                  continue
                case states[4]: //'COMMENT' 
@@ -1427,7 +1407,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.15.9'
+      return '0.15.10'
     };
 
     Chess.prototype.__getField = function __getField (fieldName, n) {
@@ -1586,7 +1566,6 @@
             if (pgn.length < 10) { return null } 
             var g = new Chess;
             g.load_pgn(pgn, headers_only);
-            DEBUG && console.log(("Game " + (g.title) + " loaded."));
             return g
         })
     };

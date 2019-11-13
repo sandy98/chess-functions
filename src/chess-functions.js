@@ -1,6 +1,8 @@
 "use strict";
 
-const DEBUG = process && process.env && process.env.DEBUG
+// const DEBUG = process && process.env && process.env.DEBUG
+
+const DEBUG =  false
 
 const lpad = (stri, padChar = '0', num = 2) => `${padChar.repeat(stri.toString().length >= num ? 0 : num - stri.toString().length)}${stri}`
 const rpad = (stri, padChar = '0', num = 2) => `${stri}${padChar.repeat(stri.toString().length >= num ? 0 : num - stri.toString().length)}`
@@ -1366,7 +1368,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.15.9'
+      return '0.15.10'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {
