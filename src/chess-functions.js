@@ -1,6 +1,6 @@
 "use strict";
 
-const DEBUG = false
+const DEBUG = process && process.env && process.env.DEBUG
 
 const lpad = (stri, padChar = '0', num = 2) => `${padChar.repeat(stri.toString().length >= num ? 0 : num - stri.toString().length)}${stri}`
 const rpad = (stri, padChar = '0', num = 2) => `${stri}${padChar.repeat(stri.toString().length >= num ? 0 : num - stri.toString().length)}`
@@ -1366,7 +1366,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.15.8'
+      return '0.15.9'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {
@@ -1494,14 +1494,30 @@ class Chess {
         return isLightSquare(sqNumber(sq)) ? 'light' : 'dark'
     }
 
+    static normalize_pgn(pgn_str) {
+        return pgn_str.replace(/\r/g, '')
+        //.replace(/\n{3,}/g, '\n\n')
+        //.replace(/(\])\s*\n{2,}\s*(\[)/g,"$1\n$2")
+        //.replace(/([a-h1-8NBRQK0O\+\#\!\?])\s*\n{2,}\s*([a-h1-8NBRQK0O\+\#\!\?])/g,"$1\n$2")
+    }
+
     static load_pgn_file(file_str, headers_only = false) {
-        const chunks = file_str.replace(/\r/g, '\n').split(/\n{2,}/g)
-        const halves = chunks.length % 2 ? chunks.slice(0, -1) : chunks
-        let retArr = []
-        for (let i = 0; i < halves.length; i += 2) {
-          retArr = [...retArr, [halves[i], halves[i + 1]].join('\n\n')] 
-          }
-        return retArr.map(pgn => {if (pgn.length < 10) return null; let g = new Chess; g.load_pgn(pgn, headers_only); return g})
+        const halves = Chess.normalize_pgn(file_str).split(/\n{2,}/g).filter(l => l.length)
+        const retArr = partition(halves, 2).map(d => d.join('\n\n'))
+        return retArr.map(pgn => {
+            if (pgn.length < 10) return null 
+            let g = new Chess
+            g.load_pgn(pgn, headers_only)
+            DEBUG && console.log(`Game ${g.title} loaded.`)
+            return g
+        })
+    }
+
+    static chunk_pgn_file(file_str, chunk_size = 50) {
+        const games = Chess.load_pgn_file(file_str)
+        .map(g => g.pgn())
+        return partition(games, chunk_size)
+        .map(gs => gs.join('\n\n'))
     }
 
     fens() { return this.__fens__}
