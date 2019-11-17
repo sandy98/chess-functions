@@ -718,7 +718,7 @@
       return (fenString + " " + turn + " " + castling + " " + enPassant + " " + halfMoveClock + " " + fullMoveNumber)
   };
 
-  var stripSan = function (san) { return san.replace(/[+#=x]/g, ''); };
+  var stripSan = function (san) { return san.replace(/[+#=x\!\?]/g, ''); };
 
   var san2args = function (fen, san) {
       var fenobj = fen2obj(fen);
@@ -1066,8 +1066,10 @@
     };
 
     Chess.prototype.console_view = function console_view (fennum, flipped) {
+          if ( flipped === void 0 ) flipped = false;
 
         fennum = fennum || this.fens().length - 1;
+        console.log(this.ascii(fennum, flipped));
     };
 
     Chess.prototype.clear = function clear$1 () {
@@ -1407,7 +1409,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.15.10'
+      return '0.16.0'
     };
 
     Chess.prototype.__getField = function __getField (fieldName, n) {
@@ -1591,6 +1593,57 @@
 
     Chess.prototype.toString = function toString () {
         return this.fen
+    };
+
+    Chess.prototype.reload_history = function reload_history () {
+          var this$1 = this;
+
+        var history_backup = this.history({verbose: true});
+        // const fens_backup = this.__fens__
+        // const result_backup = this.headers('Result')
+
+        //this.__sans__ = [this.__sans__[0]]
+        this.__fens__ = [this.__fens__[0]];
+          
+        history_backup.forEach(function (obj) {
+            // this.move(obj.san)
+            var ref = san2args(this$1.fen, obj.san);
+              var sqFrom = ref.sqFrom;
+              var sqTo = ref.sqTo;
+              var promotion = ref.promotion;
+            var newfen = tryMove(this$1.fen, sqFrom, sqTo, promotion);
+            if (newfen) {
+                this$1.__fens__ = ( this$1.__fens__ ).concat( [newfen]);
+            }
+        });
+          
+        //this.headers('Result', result_backup)
+        return true
+    };
+
+    Chess.prototype.load_json = function load_json (json) {
+        this.__sans__ = ['' ].concat( json.moves.map(function (s) { return ({san: s}); }));
+        this.__headers__ = json.headers;
+        this.__fens__ = [('FEN' in json.headers ? json.headers.FEN : Chess.defaultFen())];
+        this.headers('Result', json.result);
+        this.reload_history();
+        return true
+    };
+
+    Chess.prototype.json = function json () {
+        return {
+            headers: this.__headers__,
+            moves: this.history(),
+            result: this.headers('Result')
+        }
+    };
+
+    Chess.load_json_file = function load_json_file (json_arr) {
+        return json_arr.map(function (obj) {
+            var g = new Chess();
+            g.load_json(obj);
+            return g
+        })
     };
 
   Object.defineProperties( Chess.prototype, prototypeAccessors );

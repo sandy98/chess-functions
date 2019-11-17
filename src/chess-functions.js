@@ -726,7 +726,7 @@ const tryMove = (fen, sqFrom, sqTo, promotion = 'Q') => {
     return `${fenString} ${turn} ${castling} ${enPassant} ${halfMoveClock} ${fullMoveNumber}`
 }
 
-const stripSan = san => san.replace(/[+#=x]/g, '')
+const stripSan = san => san.replace(/[+#=x\!\?]/g, '')
 
 const san2args = (fen, san) => {
     const fenobj = fen2obj(fen)
@@ -1046,7 +1046,7 @@ class Chess {
 
     console_view(fennum, flipped = false) {
         fennum = fennum || this.fens().length - 1
-        DEBUG && console.log(this.ascii(fennum, flipped))
+        console.log(this.ascii(fennum, flipped))
     }
 
     clear() {
@@ -1368,7 +1368,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.15.10'
+      return '0.16.0'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {
@@ -1535,6 +1535,53 @@ class Chess {
     toString() {
         return this.fen
     }
+
+    reload_history() {
+        const history_backup = this.history({verbose: true})
+        // const fens_backup = this.__fens__
+        // const result_backup = this.headers('Result')
+
+        //this.__sans__ = [this.__sans__[0]]
+        this.__fens__ = [this.__fens__[0]]
+        
+        history_backup.forEach(obj => {
+            // this.move(obj.san)
+            let {sqFrom, sqTo, promotion} = san2args(this.fen, obj.san)
+            let newfen = tryMove(this.fen, sqFrom, sqTo, promotion)
+            if (newfen) {
+                this.__fens__ = [...this.__fens__, newfen]
+            }
+        })
+        
+        //this.headers('Result', result_backup)
+        return true
+    }
+
+    load_json(json) {
+        this.__sans__ = ['', ...json.moves.map(s => ({san: s}))]
+        this.__headers__ = json.headers
+        this.__fens__ = [('FEN' in json.headers ? json.headers.FEN : Chess.defaultFen())]
+        this.headers('Result', json.result)
+        this.reload_history()
+        return true
+    }
+
+    json() {
+        return {
+            headers: this.__headers__,
+            moves: this.history(),
+            result: this.headers('Result')
+        }
+    }
+
+    static load_json_file(json_arr) {
+        return json_arr.map(obj => {
+            let g = new Chess()
+            g.load_json(obj)
+            return g
+        })
+    }
+
 }
 
 const utility_funcs = {

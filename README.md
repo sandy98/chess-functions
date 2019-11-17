@@ -1,4 +1,4 @@
-# Chess Functions v. 0.15.10
+# Chess Functions v. 0.16.0
 
 A brand new chess moves validator, inspired in [chess.js](https://github.com/jhlywa/chess.js)
 
