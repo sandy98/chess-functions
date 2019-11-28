@@ -74,6 +74,7 @@ const testFen1 = '8/6B1/6p1/R6k/7p/8/8/K5R1 b KQkq - 0 1'
 const testFen2 = '8/5BB1/6p1/R6k/7p/8/8/K5R1 b KQkq - 0 1'
 
 const fen2obj = fen => {
+    if (!fen || !(fen.constructor.name === 'String')) return null
     const arr = fen.split(/\s+/)
     return {
         fenString: arr[0],
@@ -1368,7 +1369,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.16.0'
+      return '0.16.3'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {

@@ -79,6 +79,7 @@
   var pastorFen = 'r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4';
 
   var fen2obj = function (fen) {
+      if (!fen || !(fen.constructor.name === 'String')) { return null }
       var arr = fen.split(/\s+/);
       return {
           fenString: arr[0],
@@ -489,6 +490,7 @@
       
       var ref = fen2obj(fen);
       var castling = ref.castling;
+      var turn = ref.turn;
       var fenArray = ref.fenArray;
       var friend = king === 'k' ? 'b' : 'w';
       var foe = king === 'k' ? 'w' : 'b';
@@ -599,7 +601,10 @@
    
   var candidateMoves = function (fen) {
     var ref = fen2obj(fen);
+    var fenArray = ref.fenArray;
     var turn = ref.turn;
+    var castling = ref.castling;
+    var enPassant = ref.enPassant;
     var army = turn === 'w' ? wArmy(fen) : bArmy(fen);
     return army.map(function (sq) { return [sq, chessboard.filter(function (n) { return canMove(fen, sq, n); })]; })
   };
@@ -826,6 +831,7 @@
       var fenArray = ref.fenArray;
       var turn = ref.turn;
       var enPassant = ref.enPassant;
+      var castling = ref.castling;
       sqFrom = sqNumber(sqFrom);
       sqTo = sqNumber(sqTo);
       var ref$1 = [fenArray[sqFrom], fenArray[sqTo]];
@@ -1409,7 +1415,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.16.0'
+      return '0.16.3'
     };
 
     Chess.prototype.__getField = function __getField (fieldName, n) {
