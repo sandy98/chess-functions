@@ -1148,7 +1148,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
 
       if (pgn.length < 5) { return false }
       var strip_nums = function (text) { return text.replace(/\d+\.\s*(\.\.\.)?\s*/g, ''); };
-      var is_san = function (text) { return sanRegExp.test(text); };
+      var is_san = function (text) { return sanRegExp.test(text.replace(/[\?\!]+/g, '')); };
       var is_result = function (text) { return !!Chess.results().find(function (r) { return r === text; }); };
 
       var states = [
@@ -1410,7 +1410,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.16.4'
+    return '0.16.5'
   };
 
   Chess.prototype.__getField = function __getField (fieldName, n) {
