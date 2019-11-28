@@ -1057,7 +1057,9 @@ class Chess {
 
     san_with_number(number, all = false) {
         if (number < 1 || number > (this.__sans__.length - 1)) return ''
-        const {turn, fullMoveNumber} = fen2obj(this.fens()[number - 1])
+        const obj = fen2obj(this.fens()[number - 1])
+        if (!obj) return JSON.stringify(null)
+        const {turn, fullMoveNumber} = obj
         let prefix
         if (turn === 'w') {
             prefix = `${fullMoveNumber}. `
@@ -1369,7 +1371,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.16.3'
+      return '0.16.4'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {

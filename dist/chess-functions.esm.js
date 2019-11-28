@@ -1081,9 +1081,10 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
         if ( all === void 0 ) all = false;
 
       if (number < 1 || number > (this.__sans__.length - 1)) { return '' }
-      var ref = fen2obj(this.fens()[number - 1]);
-        var turn = ref.turn;
-        var fullMoveNumber = ref.fullMoveNumber;
+      var obj = fen2obj(this.fens()[number - 1]);
+      if (!obj) { return JSON.stringify(null) }
+      var turn = obj.turn;
+        var fullMoveNumber = obj.fullMoveNumber;
       var prefix;
       if (turn === 'w') {
           prefix = fullMoveNumber + ". ";
@@ -1409,7 +1410,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.16.3'
+    return '0.16.4'
   };
 
   Chess.prototype.__getField = function __getField (fieldName, n) {
