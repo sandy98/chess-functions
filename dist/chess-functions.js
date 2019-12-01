@@ -1154,7 +1154,7 @@
 
         if (pgn.length < 5) { return false }
         var strip_nums = function (text) { return text.replace(/\d+\.\s*(\.\.\.)?\s*/g, ''); };
-        var is_san = function (text) { return sanRegExp.test(text.replace(/[\?\!]+/g, '')); };
+        var is_san = function (text) { return sanRegExp.test(text.replace(/[\?\!]+$/g, '')); };
         var is_result = function (text) { return !!Chess.results().find(function (r) { return r === text; }); };
 
         var states = [
@@ -1254,7 +1254,7 @@
                         return true
                      }
                      if (is_san(token)) {
-                         var result = game.move(token);
+                         var result = game.move(token.replace(/[\!\?]+$/g, ''));
                          if (!result) {
                              return false
                          }
@@ -1416,7 +1416,7 @@
     };
 
     prototypeAccessors.version.get = function (){
-      return '0.16.5'
+      return '0.16.6'
     };
 
     Chess.prototype.__getField = function __getField (fieldName, n) {

@@ -1107,7 +1107,7 @@ class Chess {
     load_pgn(pgn, headers_only = false) {
         if (pgn.length < 5) return false
         const strip_nums = text => text.replace(/\d+\.\s*(\.\.\.)?\s*/g, '')
-        const is_san = text => sanRegExp.test(text.replace(/[\?\!]+/g, ''))
+        const is_san = text => sanRegExp.test(text.replace(/[\?\!]+$/g, ''))
         const is_result = text => !!Chess.results().find(r => r === text)
 
         const states = [
@@ -1220,7 +1220,7 @@ class Chess {
                         return true
                      }
                      if (is_san(token)) {
-                         const result = game.move(token)
+                         const result = game.move(token.replace(/[\!\?]+$/g, ''))
                          if (!result) {
                              DEBUG && console.log(`${token} move failed to load.`)
                              return false
@@ -1371,7 +1371,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.16.5'
+      return '0.16.6'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {
