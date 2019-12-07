@@ -1300,15 +1300,19 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
                   sqFrom = result.sqFrom;
                   sqTo = result.sqTo;
                   promotion = result.promotion;
-              } else if (/[a-h][1-8]-?[a-h][1-8][QRNBqrnb]?/.test(moveArgs[0])) {
+              } else if (/([a-h][1-8])\-?([a-h][1-8])\=?([BRNQbrnq]?)/.test(moveArgs[0])) {
+                  /*
                   if (moveArgs[0][moveArgs[0].length - 1].match(/QRNB/i)) {
-                      promotion = moveArgs[0][moveArgs[0].length - 1].toUpperCase();
+                      promotion = moveArgs[0][moveArgs[0].length - 1].toUpperCase()
                   } else {
-                      promotion = null;
+                      promotion = null
                   }
-                  var moveStr = moveArgs[0].replace(/-/g, '');
-                  sqFrom = sqNumber(moveStr.slice(0,2));
-                  sqTo = sqNumber(moveStr.slice(2,4));
+                  const moveStr = moveArgs[0].replace(/-/g, '')
+                  sqFrom = sqNumber(moveStr.slice(0,2))
+                  sqTo = sqNumber(moveStr.slice(2,4))
+                  */
+                 var m = moveArgs[0].match(/([a-h][1-8])\-?([a-h][1-8])\=?([BRNQbrnq]?)/)
+                 [promotion] = [sqNumber(m[1]), sqNumber(m[2]), m[3] || null];
               }
               break
           default:
@@ -1410,7 +1414,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.16.6'
+    return '0.16.7'
   };
 
   Chess.prototype.__getField = function __getField (fieldName, n) {
