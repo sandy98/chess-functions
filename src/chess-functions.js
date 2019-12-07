@@ -1282,8 +1282,13 @@ class Chess {
                     sqFrom = sqNumber(moveStr.slice(0,2))
                     sqTo = sqNumber(moveStr.slice(2,4))
                     */
-                   const m = moveArgs[0].match(/([a-h][1-8])\-?([a-h][1-8])\=?([BRNQbrnq]?)/)
-                   [sqFrom, sqTo, promotion] = [sqNumber(m[1]), sqNumber(m[2]), m[3] || null]
+                   const mtch = moveArgs[0].match(/([a-h][1-8])\-?([a-h][1-8])\=?([BRNQbrnq]?)/)
+                   if (mtch) {
+                     [sqFrom, sqTo, promotion] = [sqNumber(mtch[1]), sqNumber(mtch[2]), mtch[3] || null]
+                   } else {
+                       [sqFrom, sqTo, promotion] = [-1, -1, null]
+                       console.log(`No entiendo porque, pero ${moveArgs[0]} no matchea... :-(`)
+                   }
                 }
                 break
             default:
@@ -1375,7 +1380,7 @@ class Chess {
     }
 
     get version()  {
-      return '0.16.7'
+      return '0.16.8'
     }
 
     __getField(fieldName = 'turn', n = this.history().length) {

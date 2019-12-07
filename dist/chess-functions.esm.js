@@ -1286,9 +1286,10 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   Chess.prototype.move = function move () {
+        var assign, assign$1;
+
         var moveArgs = [], len = arguments.length;
         while ( len-- ) moveArgs[ len ] = arguments[ len ];
-
       var fenObj = fen2obj(this.fen); 
       var sqFrom, sqTo, promotion;
       switch (moveArgs.length) {
@@ -1311,8 +1312,13 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
                   sqFrom = sqNumber(moveStr.slice(0,2))
                   sqTo = sqNumber(moveStr.slice(2,4))
                   */
-                 var m = moveArgs[0].match(/([a-h][1-8])\-?([a-h][1-8])\=?([BRNQbrnq]?)/)
-                 [promotion] = [sqNumber(m[1]), sqNumber(m[2]), m[3] || null];
+                 var mtch = moveArgs[0].match(/([a-h][1-8])\-?([a-h][1-8])\=?([BRNQbrnq]?)/);
+                 if (mtch) {
+                   (assign = [sqNumber(mtch[1]), sqNumber(mtch[2]), mtch[3] || null], sqFrom = assign[0], sqTo = assign[1], promotion = assign[2]);
+                 } else {
+                     (assign$1 = [-1, -1, null], sqFrom = assign$1[0], sqTo = assign$1[1], promotion = assign$1[2]);
+                     console.log(("No entiendo porque, pero " + (moveArgs[0]) + " no matchea... :-("));
+                 }
               }
               break
           default:
@@ -1414,7 +1420,7 @@ var prototypeAccessors = { title: { configurable: true },version: { configurable
   };
 
   prototypeAccessors.version.get = function (){
-    return '0.16.7'
+    return '0.16.8'
   };
 
   Chess.prototype.__getField = function __getField (fieldName, n) {
